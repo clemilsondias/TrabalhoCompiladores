@@ -98,7 +98,7 @@ decl_locais: decl_variavel decl_locais
             | {printf("BISON -> decl locais\n");};
 
 /* regra para bloco de comandos entre chaves */
-bloco:   '{' comandos '}' {printf("BISON -> bloco\n");}
+bloco:   '{' comandos ';' '}' {printf("BISON -> bloco\n");}
        | '{' '}';
 
 /* regra para sequência de comandos*/
