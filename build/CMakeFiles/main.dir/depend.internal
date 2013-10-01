@@ -9,29 +9,32 @@ CMakeFiles/main.dir/lexer.c.o
  ../include/gv.h
  ../include/iks_ast.h
  ../include/main.h
- /home/clemilson/compiladores/build/lexer.c
- /home/clemilson/compiladores/build/parser.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h
 CMakeFiles/main.dir/parser.c.o
- /home/clemilson/compiladores/build/../include/comp_dict.h
- /home/clemilson/compiladores/build/../include/comp_graph.h
- /home/clemilson/compiladores/build/../include/comp_list.h
- /home/clemilson/compiladores/build/../include/comp_tree.h
- /home/clemilson/compiladores/build/../include/gv.h
- /home/clemilson/compiladores/build/../include/iks_ast.h
- /home/clemilson/compiladores/build/../include/main.h
- /home/clemilson/compiladores/build/parser.c
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_dict.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_graph.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_list.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_tree.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/gv.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/iks_ast.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/main.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c
 CMakeFiles/main.dir/src/comp_dict.c.o
- /home/clemilson/compiladores/src/../include/comp_dict.h
- /home/clemilson/compiladores/src/comp_dict.c
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/../include/comp_dict.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_dict.c
 CMakeFiles/main.dir/src/comp_graph.c.o
- /home/clemilson/compiladores/src/comp_graph.c
+ ../include/comp_graph.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_graph.c
 CMakeFiles/main.dir/src/comp_list.c.o
- /home/clemilson/compiladores/src/comp_list.c
+ ../include/comp_list.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_list.c
 CMakeFiles/main.dir/src/comp_tree.c.o
- /home/clemilson/compiladores/src/comp_tree.c
+ ../include/comp_tree.h
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_tree.c
 CMakeFiles/main.dir/src/gv.c.o
  ../include/iks_ast.h
- /home/clemilson/compiladores/src/gv.c
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/gv.c
 CMakeFiles/main.dir/src/main.c.o
  ../include/comp_dict.h
  ../include/comp_graph.h
@@ -40,4 +43,4 @@ CMakeFiles/main.dir/src/main.c.o
  ../include/gv.h
  ../include/iks_ast.h
  ../include/main.h
- /home/clemilson/compiladores/src/main.c
+ /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/main.c

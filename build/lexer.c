@@ -1,6 +1,6 @@
-#line 2 "/home/clemilson/compiladores/build/lexer.c"
+#line 2 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
-#line 4 "/home/clemilson/compiladores/build/lexer.c"
+#line 4 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 #define  YY_INT_ALIGNED short int
 
@@ -562,7 +562,7 @@ int LineNumber = 1;
 
 
 
-#line 566 "/home/clemilson/compiladores/build/lexer.c"
+#line 566 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 #define INITIAL 0
 #define comentario 1
@@ -753,7 +753,7 @@ YY_DECL
     
 #line 34 "scanner.l"
 
-#line 757 "/home/clemilson/compiladores/build/lexer.c"
+#line 757 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -1177,7 +1177,7 @@ YY_RULE_SETUP
 #line 203 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1181 "/home/clemilson/compiladores/build/lexer.c"
+#line 1181 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comentario):
 case YY_STATE_EOF(comentario1):

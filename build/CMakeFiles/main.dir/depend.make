@@ -23,10 +23,13 @@ CMakeFiles/main.dir/parser.c.o: parser.c
 CMakeFiles/main.dir/src/comp_dict.c.o: ../src/../include/comp_dict.h
 CMakeFiles/main.dir/src/comp_dict.c.o: ../src/comp_dict.c
 
+CMakeFiles/main.dir/src/comp_graph.c.o: ../include/comp_graph.h
 CMakeFiles/main.dir/src/comp_graph.c.o: ../src/comp_graph.c
 
+CMakeFiles/main.dir/src/comp_list.c.o: ../include/comp_list.h
 CMakeFiles/main.dir/src/comp_list.c.o: ../src/comp_list.c
 
+CMakeFiles/main.dir/src/comp_tree.c.o: ../include/comp_tree.h
 CMakeFiles/main.dir/src/comp_tree.c.o: ../src/comp_tree.c
 
 CMakeFiles/main.dir/src/gv.c.o: ../include/iks_ast.h

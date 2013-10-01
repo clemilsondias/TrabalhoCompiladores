@@ -34,35 +34,35 @@ iks_ast.h
 gv.h
 ../include/gv.h
 
-/home/clemilson/compiladores/build/../include/comp_dict.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_dict.h
 
-/home/clemilson/compiladores/build/../include/comp_graph.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_graph.h
 
-/home/clemilson/compiladores/build/../include/comp_list.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_list.h
 
-/home/clemilson/compiladores/build/../include/comp_tree.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_tree.h
 
-/home/clemilson/compiladores/build/../include/gv.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/gv.h
 
-/home/clemilson/compiladores/build/../include/iks_ast.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/iks_ast.h
 
-/home/clemilson/compiladores/build/../include/main.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/main.h
 stdio.h
 -
 comp_dict.h
-/home/clemilson/compiladores/build/../include/comp_dict.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_dict.h
 comp_list.h
-/home/clemilson/compiladores/build/../include/comp_list.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_list.h
 comp_tree.h
-/home/clemilson/compiladores/build/../include/comp_tree.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_tree.h
 comp_graph.h
-/home/clemilson/compiladores/build/../include/comp_graph.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/comp_graph.h
 iks_ast.h
-/home/clemilson/compiladores/build/../include/iks_ast.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/iks_ast.h
 gv.h
-/home/clemilson/compiladores/build/../include/gv.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/gv.h
 
-/home/clemilson/compiladores/build/lexer.c
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c
 stdio.h
 -
 string.h
@@ -76,17 +76,17 @@ inttypes.h
 stdlib.h
 -
 main.h
-/home/clemilson/compiladores/build/main.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/main.h
 parser.h
-/home/clemilson/compiladores/build/parser.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h
 unistd.h
 -
 
-/home/clemilson/compiladores/build/parser.c
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c
 stdio.h
 -
 ../include/main.h
-/home/clemilson/compiladores/build/../include/main.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/main.h
 stddef.h
 -
 libintl.h
@@ -102,5 +102,5 @@ stdlib.h
 stdio.h
 -
 
-/home/clemilson/compiladores/build/parser.h
+/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h
 

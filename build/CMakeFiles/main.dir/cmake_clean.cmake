@@ -1,8 +1,4 @@
 FILE(REMOVE_RECURSE
-  "lexer.c"
-  "parser.c"
-  "parser.h"
-  "parser.output"
   "CMakeFiles/main.dir/lexer.c.o"
   "CMakeFiles/main.dir/parser.c.o"
   "CMakeFiles/main.dir/src/main.c.o"
@@ -11,6 +7,10 @@ FILE(REMOVE_RECURSE
   "CMakeFiles/main.dir/src/comp_list.c.o"
   "CMakeFiles/main.dir/src/comp_tree.c.o"
   "CMakeFiles/main.dir/src/comp_graph.c.o"
+  "lexer.c"
+  "parser.c"
+  "parser.h"
+  "parser.output"
   "main.pdb"
   "main"
 )

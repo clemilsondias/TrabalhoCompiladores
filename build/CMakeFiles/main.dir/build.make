@@ -31,14 +31,11 @@ CMAKE_COMMAND = /usr/bin/cmake
 # The command to remove a file.
 RM = /usr/bin/cmake -E remove -f
 
-# Escaping for special characters.
-EQUALS = =
-
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/clemilson/compiladores
+CMAKE_SOURCE_DIR = "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/clemilson/compiladores/build
+CMAKE_BINARY_DIR = "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build"
 
 # Include any dependencies generated for this target.
 include CMakeFiles/main.dir/depend.make
@@ -49,33 +46,19 @@ include CMakeFiles/main.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/main.dir/flags.make
 
-lexer.c: ../scanner.l
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_1)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "[FLEX][scanner] Building scanner with flex 2.5.35"
-	cd /home/clemilson/compiladores && /usr/bin/flex -o/home/clemilson/compiladores/build/lexer.c scanner.l
-
-parser.c: ../parser.y
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_2)
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "[BISON][parser] Building parser with bison 2.5"
-	cd /home/clemilson/compiladores && /usr/bin/bison --verbose -d -o /home/clemilson/compiladores/build/parser.c parser.y
-
-parser.h: parser.c
-
-parser.output: parser.c
-
 CMakeFiles/main.dir/lexer.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/lexer.c.o: lexer.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_3)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/main.dir/lexer.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/lexer.c.o   -c /home/clemilson/compiladores/build/lexer.c
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/lexer.c.o   -c "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 CMakeFiles/main.dir/lexer.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/lexer.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/clemilson/compiladores/build/lexer.c > CMakeFiles/main.dir/lexer.c.i
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c" > CMakeFiles/main.dir/lexer.c.i
 
 CMakeFiles/main.dir/lexer.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/lexer.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/clemilson/compiladores/build/lexer.c -o CMakeFiles/main.dir/lexer.c.s
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c" -o CMakeFiles/main.dir/lexer.c.s
 
 CMakeFiles/main.dir/lexer.c.o.requires:
 .PHONY : CMakeFiles/main.dir/lexer.c.o.requires
@@ -88,17 +71,17 @@ CMakeFiles/main.dir/lexer.c.o.provides.build: CMakeFiles/main.dir/lexer.c.o
 
 CMakeFiles/main.dir/parser.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/parser.c.o: parser.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_4)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_2)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/main.dir/parser.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/parser.c.o   -c /home/clemilson/compiladores/build/parser.c
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/parser.c.o   -c "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
 
 CMakeFiles/main.dir/parser.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/parser.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/clemilson/compiladores/build/parser.c > CMakeFiles/main.dir/parser.c.i
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c" > CMakeFiles/main.dir/parser.c.i
 
 CMakeFiles/main.dir/parser.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/parser.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/clemilson/compiladores/build/parser.c -o CMakeFiles/main.dir/parser.c.s
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c" -o CMakeFiles/main.dir/parser.c.s
 
 CMakeFiles/main.dir/parser.c.o.requires:
 .PHONY : CMakeFiles/main.dir/parser.c.o.requires
@@ -111,17 +94,17 @@ CMakeFiles/main.dir/parser.c.o.provides.build: CMakeFiles/main.dir/parser.c.o
 
 CMakeFiles/main.dir/src/main.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/main.c.o: ../src/main.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_5)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_3)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/main.dir/src/main.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/main.c.o   -c /home/clemilson/compiladores/src/main.c
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/main.c.o   -c "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/main.c"
 
 CMakeFiles/main.dir/src/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/src/main.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/clemilson/compiladores/src/main.c > CMakeFiles/main.dir/src/main.c.i
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/main.c" > CMakeFiles/main.dir/src/main.c.i
 
 CMakeFiles/main.dir/src/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/src/main.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/clemilson/compiladores/src/main.c -o CMakeFiles/main.dir/src/main.c.s
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/main.c" -o CMakeFiles/main.dir/src/main.c.s
 
 CMakeFiles/main.dir/src/main.c.o.requires:
 .PHONY : CMakeFiles/main.dir/src/main.c.o.requires
@@ -134,17 +117,17 @@ CMakeFiles/main.dir/src/main.c.o.provides.build: CMakeFiles/main.dir/src/main.c.
 
 CMakeFiles/main.dir/src/gv.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/gv.c.o: ../src/gv.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_6)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_4)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/main.dir/src/gv.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/gv.c.o   -c /home/clemilson/compiladores/src/gv.c
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/gv.c.o   -c "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/gv.c"
 
 CMakeFiles/main.dir/src/gv.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/src/gv.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/clemilson/compiladores/src/gv.c > CMakeFiles/main.dir/src/gv.c.i
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/gv.c" > CMakeFiles/main.dir/src/gv.c.i
 
 CMakeFiles/main.dir/src/gv.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/src/gv.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/clemilson/compiladores/src/gv.c -o CMakeFiles/main.dir/src/gv.c.s
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/gv.c" -o CMakeFiles/main.dir/src/gv.c.s
 
 CMakeFiles/main.dir/src/gv.c.o.requires:
 .PHONY : CMakeFiles/main.dir/src/gv.c.o.requires
@@ -157,17 +140,17 @@ CMakeFiles/main.dir/src/gv.c.o.provides.build: CMakeFiles/main.dir/src/gv.c.o
 
 CMakeFiles/main.dir/src/comp_dict.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/comp_dict.c.o: ../src/comp_dict.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_7)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_5)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/main.dir/src/comp_dict.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/comp_dict.c.o   -c /home/clemilson/compiladores/src/comp_dict.c
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/comp_dict.c.o   -c "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_dict.c"
 
 CMakeFiles/main.dir/src/comp_dict.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/src/comp_dict.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/clemilson/compiladores/src/comp_dict.c > CMakeFiles/main.dir/src/comp_dict.c.i
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_dict.c" > CMakeFiles/main.dir/src/comp_dict.c.i
 
 CMakeFiles/main.dir/src/comp_dict.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/src/comp_dict.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/clemilson/compiladores/src/comp_dict.c -o CMakeFiles/main.dir/src/comp_dict.c.s
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_dict.c" -o CMakeFiles/main.dir/src/comp_dict.c.s
 
 CMakeFiles/main.dir/src/comp_dict.c.o.requires:
 .PHONY : CMakeFiles/main.dir/src/comp_dict.c.o.requires
@@ -180,17 +163,17 @@ CMakeFiles/main.dir/src/comp_dict.c.o.provides.build: CMakeFiles/main.dir/src/co
 
 CMakeFiles/main.dir/src/comp_list.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/comp_list.c.o: ../src/comp_list.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_8)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_6)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/main.dir/src/comp_list.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/comp_list.c.o   -c /home/clemilson/compiladores/src/comp_list.c
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/comp_list.c.o   -c "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_list.c"
 
 CMakeFiles/main.dir/src/comp_list.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/src/comp_list.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/clemilson/compiladores/src/comp_list.c > CMakeFiles/main.dir/src/comp_list.c.i
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_list.c" > CMakeFiles/main.dir/src/comp_list.c.i
 
 CMakeFiles/main.dir/src/comp_list.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/src/comp_list.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/clemilson/compiladores/src/comp_list.c -o CMakeFiles/main.dir/src/comp_list.c.s
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_list.c" -o CMakeFiles/main.dir/src/comp_list.c.s
 
 CMakeFiles/main.dir/src/comp_list.c.o.requires:
 .PHONY : CMakeFiles/main.dir/src/comp_list.c.o.requires
@@ -203,17 +186,17 @@ CMakeFiles/main.dir/src/comp_list.c.o.provides.build: CMakeFiles/main.dir/src/co
 
 CMakeFiles/main.dir/src/comp_tree.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/comp_tree.c.o: ../src/comp_tree.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_9)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_7)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/main.dir/src/comp_tree.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/comp_tree.c.o   -c /home/clemilson/compiladores/src/comp_tree.c
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/comp_tree.c.o   -c "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_tree.c"
 
 CMakeFiles/main.dir/src/comp_tree.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/src/comp_tree.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/clemilson/compiladores/src/comp_tree.c > CMakeFiles/main.dir/src/comp_tree.c.i
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_tree.c" > CMakeFiles/main.dir/src/comp_tree.c.i
 
 CMakeFiles/main.dir/src/comp_tree.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/src/comp_tree.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/clemilson/compiladores/src/comp_tree.c -o CMakeFiles/main.dir/src/comp_tree.c.s
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_tree.c" -o CMakeFiles/main.dir/src/comp_tree.c.s
 
 CMakeFiles/main.dir/src/comp_tree.c.o.requires:
 .PHONY : CMakeFiles/main.dir/src/comp_tree.c.o.requires
@@ -226,17 +209,17 @@ CMakeFiles/main.dir/src/comp_tree.c.o.provides.build: CMakeFiles/main.dir/src/co
 
 CMakeFiles/main.dir/src/comp_graph.c.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/comp_graph.c.o: ../src/comp_graph.c
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/clemilson/compiladores/build/CMakeFiles $(CMAKE_PROGRESS_10)
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_8)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building C object CMakeFiles/main.dir/src/comp_graph.c.o"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/comp_graph.c.o   -c /home/clemilson/compiladores/src/comp_graph.c
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -o CMakeFiles/main.dir/src/comp_graph.c.o   -c "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_graph.c"
 
 CMakeFiles/main.dir/src/comp_graph.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing C source to CMakeFiles/main.dir/src/comp_graph.c.i"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -E /home/clemilson/compiladores/src/comp_graph.c > CMakeFiles/main.dir/src/comp_graph.c.i
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -E "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_graph.c" > CMakeFiles/main.dir/src/comp_graph.c.i
 
 CMakeFiles/main.dir/src/comp_graph.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling C source to assembly CMakeFiles/main.dir/src/comp_graph.c.s"
-	/usr/bin/cc  $(C_DEFINES) $(C_FLAGS) -S /home/clemilson/compiladores/src/comp_graph.c -o CMakeFiles/main.dir/src/comp_graph.c.s
+	/usr/bin/gcc  $(C_DEFINES) $(C_FLAGS) -S "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/src/comp_graph.c" -o CMakeFiles/main.dir/src/comp_graph.c.s
 
 CMakeFiles/main.dir/src/comp_graph.c.o.requires:
 .PHONY : CMakeFiles/main.dir/src/comp_graph.c.o.requires
@@ -246,6 +229,20 @@ CMakeFiles/main.dir/src/comp_graph.c.o.provides: CMakeFiles/main.dir/src/comp_gr
 .PHONY : CMakeFiles/main.dir/src/comp_graph.c.o.provides
 
 CMakeFiles/main.dir/src/comp_graph.c.o.provides.build: CMakeFiles/main.dir/src/comp_graph.c.o
+
+lexer.c: ../scanner.l
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_9)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "[FLEX][scanner] Building scanner with flex 2.5.35"
+	cd "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores" && /usr/bin/flex -o/home/rafael/UFRGS\ -\ ENGENHARIA\ DE\ COMPUTACAO/ETAPA\ 07/INF01147\ -\ Compiladores/Final/TrabalhoCompiladores/build/lexer.c scanner.l
+
+parser.c: ../parser.y
+	$(CMAKE_COMMAND) -E cmake_progress_report "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles" $(CMAKE_PROGRESS_10)
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "[BISON][parser] Building parser with bison 2.5"
+	cd "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores" && /usr/bin/bison --verbose -d -o /home/rafael/UFRGS\ -\ ENGENHARIA\ DE\ COMPUTACAO/ETAPA\ 07/INF01147\ -\ Compiladores/Final/TrabalhoCompiladores/build/parser.c parser.y
+
+parser.h: parser.c
+
+parser.output: parser.c
 
 # Object files for target main
 main_OBJECTS = \
@@ -269,8 +266,8 @@ main: CMakeFiles/main.dir/src/comp_dict.c.o
 main: CMakeFiles/main.dir/src/comp_list.c.o
 main: CMakeFiles/main.dir/src/comp_tree.c.o
 main: CMakeFiles/main.dir/src/comp_graph.c.o
+main: /usr/lib/x86_64-linux-gnu/libfl.so
 main: CMakeFiles/main.dir/build.make
-main: /usr/lib/i386-linux-gnu/libfl.so
 main: CMakeFiles/main.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --red --bold "Linking C executable main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
@@ -297,6 +294,6 @@ CMakeFiles/main.dir/depend: lexer.c
 CMakeFiles/main.dir/depend: parser.c
 CMakeFiles/main.dir/depend: parser.h
 CMakeFiles/main.dir/depend: parser.output
-	cd /home/clemilson/compiladores/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/clemilson/compiladores /home/clemilson/compiladores /home/clemilson/compiladores/build /home/clemilson/compiladores/build /home/clemilson/compiladores/build/CMakeFiles/main.dir/DependInfo.cmake --color=$(COLOR)
+	cd "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build" && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores" "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores" "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build" "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build" "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/CMakeFiles/main.dir/DependInfo.cmake" --color=$(COLOR)
 .PHONY : CMakeFiles/main.dir/depend
 
