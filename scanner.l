@@ -78,7 +78,7 @@ return 		{ return TK_PR_RETURN; }
 "\n"		{++LineNumber;++yylineno;}
 
 {LIT_STRING} 	{
-//			printf("string. o texto é:%s\n",yytext);					
+			printf("string. o texto é:%s\n",yytext);					
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
                         if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -89,31 +89,15 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_STRING;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_STRING; 
 			}
 		}
 
-{ID} 		{
-//			printf("ID. o texto é:%s\n",yytext);
-			if (!dicionarioExiste(dicionario))
-				initDicionario();
-			if(dicionarioProcuraChave(dicionario,yytext) == 0)
-			{
-//				printf("Criado item no dicionario:%s\n",yytext);
-				itemDic = dicionarioCriaItem(yytext,yylineno,TK_IDENTIFICADOR,IKS_SIMBOLO_IDENTIFICADOR);
-				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
-				return TK_IDENTIFICADOR;
-			} else 
-			{
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
-                                return TK_IDENTIFICADOR;
-			}
-		}
 
 {LIT_INT} 	{ 
-//			printf("literal int. o texto é:%s\n",yytext);
+			printf("literal int. o texto é:%s\n",yytext);
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -124,13 +108,14 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_INT;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_INT; 
 			}
 		}
 			
 {LIT_FLOAT} 	{
-//			printf("lit float. o texto é:%s\n",yytext);				
+			printf("lit float. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -141,13 +126,14 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_FLOAT;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_FLOAT; 
 			}
 		}
 			
 {LIT_FALSE} 	{ 
-//			printf("lit false. o texto é:%s\n",yytext);				
+			printf("lit false. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -158,13 +144,14 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_FALSE;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_FALSE; 
 			}
 		}
 			
 {LIT_TRUE} 	{ 
-//			printf("lit true. o texto é:%s\n",yytext);				
+			printf("lit true. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -175,13 +162,14 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_TRUE;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_TRUE; 
 			}
 		}
 			
 {LIT_CHAR} 	{ 
-//			printf("lit char. o texto é:%s\n",yytext);				
+			printf("lit char. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -192,11 +180,35 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_CHAR;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_CHAR; 
 			}
 		}
 			
+{ID} 		{
+			printf("ID. o texto é:%s\n",yytext);
+			if (!dicionarioExiste(dicionario))
+				initDicionario();
+			if(dicionarioProcuraChave(dicionario,yytext) == 0)
+			{
+//				printf("Criado item no dicionario:%s\n",yytext);
+				itemDic = dicionarioCriaItem(yytext,yylineno,TK_IDENTIFICADOR,IKS_SIMBOLO_IDENTIFICADOR);
+				yylval.symbol = itemDic;
+				dicionarioInsereItem(dicionario,itemDic);
+				
+				//printf("----------\n\n");
+				//dicionarioImprime(dicionario);
+				//printf("\n\n----------\n\n");
+				
+				return TK_IDENTIFICADOR;
+			} else 
+			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
+				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
+                                return TK_IDENTIFICADOR;
+			}
+		}
 
 
 . { printf("Erro\n"); return TOKEN_ERRO; }

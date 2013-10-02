@@ -217,3 +217,11 @@ int dicionarioQtdeItens(comp_dict_t *Dicionario) {
    }
    return qtde;
 }
+
+
+
+
+
+comp_dict_item_t* dicionarioRetornaChave(comp_dict_t *Dicionario, char *Chave){
+	return dicionarioGetItem(Dicionario, Chave);
+}

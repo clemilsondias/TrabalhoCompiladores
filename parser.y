@@ -48,11 +48,13 @@ extern int  yylineno;
 %token<symbol> TK_LIT_STRING
 %token<symbol> TK_IDENTIFICADOR
 %token TOKEN_ERRO
+
+
 %right '='
+%nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<'
+%left TK_OC_AND TK_OC_OR
 %left '+' '-'
 %left '*' '/'
-%left TK_OC_AND TK_OC_OR
-%nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<'
 
 
 %%
@@ -60,8 +62,8 @@ extern int  yylineno;
 
 
 /* regra inicial da gramática */
-s: declaracoes s { return IKS_SYNTAX_SUCESSO; }
-   |             { return IKS_SYNTAX_SUCESSO; };
+s: declaracoes s { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; }
+   |             { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; };
 
 /* regra de declaracoes */
 declaracoes: decl_variavel 
@@ -98,14 +100,15 @@ decl_locais: decl_variavel decl_locais
             | {printf("BISON -> decl locais\n");};
 
 /* regra para bloco de comandos entre chaves */
-bloco:   '{' comandos '}' {printf("BISON -> bloco\n");};
+bloco:   '{' comandos '}' {printf("BISON -> bloco\n");}
+       | '{' '}';
  
 
 /* regra para sequência de comandos*/
-comandos: comando_simples comandos {printf("BISON -> comandos via simples\n");} 
-        | fluxo_controle comandos {printf("BISON -> comandos via fluxo\n");}
-	| comando_simples
-	| fluxo_controle
+comandos: comando_simples ';' comandos {printf("BISON -> comandos via simples\n");} 
+        | fluxo_controle  comandos {printf("BISON -> comandos via fluxo\n");}
+	| comando_simples ';'
+	| fluxo_controle 
         | bloco comandos {printf("BISON -> comandos bloco\n");} 
 	| bloco
         | ';'  {printf("BISON -> comandos so ponto e virgula\n");};
@@ -116,11 +119,11 @@ comando: comando_simples
 	| fluxo_controle;
 
 /* comandos simples, ou seja, comando + ponto e vírgula */
-comando_simples: atribuicao ';' 
-               | entrada ';'
-               | saida
-               | retorno ';'
-               | chamada_funcao ';';
+comando_simples: atribuicao 
+               | entrada
+               | saida 
+               | retorno 
+               | chamada_funcao;
 
 /* regra para atribuições */
 atribuicao: TK_IDENTIFICADOR '=' expressao {printf("BISON -> atribuição de expressão: %s = \n",$1->chave);}

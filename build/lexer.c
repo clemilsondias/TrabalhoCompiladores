@@ -381,18 +381,18 @@ struct yy_trans_info
 static yyconst flex_int16_t yy_accept[118] =
     {   0,
         0,    0,    2,    2,    7,    7,   47,   45,    9,   37,
-       23,   45,   23,   23,   45,   29,   23,   40,   28,   23,
-       30,   23,   39,   27,   26,   39,   39,   39,   39,   39,
-       39,   39,   39,   39,   39,   39,   25,   45,   24,    2,
+       23,   45,   23,   23,   45,   29,   23,   39,   28,   23,
+       30,   23,   44,   27,   26,   44,   44,   44,   44,   44,
+       44,   44,   44,   44,   44,   44,   25,   45,   24,    2,
         4,    3,    7,    8,   34,    0,   38,    0,   35,    0,
-        0,    1,    6,    0,   40,   31,   33,   32,   39,   39,
-       39,   19,   39,   39,   39,   15,   39,   39,   39,   39,
-       39,   39,   39,   36,    2,    3,    3,    5,    7,   44,
-       41,   39,   39,   39,   39,   39,   39,   10,   39,   39,
-       39,   39,   39,   39,   12,   13,   17,   39,   39,   39,
+        0,    1,    6,    0,   39,   31,   33,   32,   44,   44,
+       44,   19,   44,   44,   44,   15,   44,   44,   44,   44,
+       44,   44,   44,   36,    2,    3,    3,    5,    7,   43,
+       40,   44,   44,   44,   44,   44,   44,   10,   44,   44,
+       44,   44,   44,   44,   12,   13,   17,   44,   44,   44,
 
-       39,   39,   39,   16,   39,   39,   39,   11,   20,   39,
-       39,   39,   18,   21,   22,   14,    0
+       44,   44,   44,   16,   42,   44,   41,   11,   20,   44,
+       44,   44,   18,   21,   22,   14,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -1029,7 +1029,7 @@ case 38:
 YY_RULE_SETUP
 #line 80 "scanner.l"
 {
-//			printf("string. o texto é:%s\n",yytext);					
+			printf("string. o texto é:%s\n",yytext);					
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
                         if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -1040,6 +1040,7 @@ YY_RULE_SETUP
 				return TK_LIT_STRING;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_STRING; 
 			}
@@ -1047,30 +1048,9 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 97 "scanner.l"
-{
-//			printf("ID. o texto é:%s\n",yytext);
-			if (!dicionarioExiste(dicionario))
-				initDicionario();
-			if(dicionarioProcuraChave(dicionario,yytext) == 0)
-			{
-//				printf("Criado item no dicionario:%s\n",yytext);
-				itemDic = dicionarioCriaItem(yytext,yylineno,TK_IDENTIFICADOR,IKS_SIMBOLO_IDENTIFICADOR);
-				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
-				return TK_IDENTIFICADOR;
-			} else 
-			{
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
-                                return TK_IDENTIFICADOR;
-			}
-		}
-	YY_BREAK
-case 40:
-YY_RULE_SETUP
-#line 115 "scanner.l"
+#line 99 "scanner.l"
 { 
-//			printf("literal int. o texto é:%s\n",yytext);
+			printf("literal int. o texto é:%s\n",yytext);
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -1081,16 +1061,17 @@ YY_RULE_SETUP
 				return TK_LIT_INT;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_INT; 
 			}
 		}
 	YY_BREAK
-case 41:
+case 40:
 YY_RULE_SETUP
-#line 132 "scanner.l"
+#line 117 "scanner.l"
 {
-//			printf("lit float. o texto é:%s\n",yytext);				
+			printf("lit float. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -1101,16 +1082,17 @@ YY_RULE_SETUP
 				return TK_LIT_FLOAT;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_FLOAT; 
 			}
 		}
 	YY_BREAK
-case 42:
+case 41:
 YY_RULE_SETUP
-#line 149 "scanner.l"
+#line 135 "scanner.l"
 { 
-//			printf("lit false. o texto é:%s\n",yytext);				
+			printf("lit false. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -1121,16 +1103,17 @@ YY_RULE_SETUP
 				return TK_LIT_FALSE;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_FALSE; 
 			}
 		}
 	YY_BREAK
-case 43:
+case 42:
 YY_RULE_SETUP
-#line 166 "scanner.l"
+#line 153 "scanner.l"
 { 
-//			printf("lit true. o texto é:%s\n",yytext);				
+			printf("lit true. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -1141,17 +1124,18 @@ YY_RULE_SETUP
 				return TK_LIT_TRUE;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_TRUE; 
 			}
 		}
 	YY_BREAK
-case 44:
-/* rule 44 can match eol */
+case 43:
+/* rule 43 can match eol */
 YY_RULE_SETUP
-#line 183 "scanner.l"
+#line 171 "scanner.l"
 { 
-//			printf("lit char. o texto é:%s\n",yytext);				
+			printf("lit char. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario,yytext) == 0)
@@ -1162,22 +1146,50 @@ YY_RULE_SETUP
 				return TK_LIT_CHAR;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_CHAR; 
 			}
 		}
 	YY_BREAK
+case 44:
+YY_RULE_SETUP
+#line 189 "scanner.l"
+{
+			printf("ID. o texto é:%s\n",yytext);
+			if (!dicionarioExiste(dicionario))
+				initDicionario();
+			if(dicionarioProcuraChave(dicionario,yytext) == 0)
+			{
+//				printf("Criado item no dicionario:%s\n",yytext);
+				itemDic = dicionarioCriaItem(yytext,yylineno,TK_IDENTIFICADOR,IKS_SIMBOLO_IDENTIFICADOR);
+				yylval.symbol = itemDic;
+				dicionarioInsereItem(dicionario,itemDic);
+				
+				//printf("----------\n\n");
+				//dicionarioImprime(dicionario);
+				//printf("\n\n----------\n\n");
+				
+				return TK_IDENTIFICADOR;
+			} else 
+			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
+				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
+                                return TK_IDENTIFICADOR;
+			}
+		}
+	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 202 "scanner.l"
+#line 214 "scanner.l"
 { printf("Erro\n"); return TOKEN_ERRO; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 203 "scanner.l"
+#line 215 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1181 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
+#line 1193 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comentario):
 case YY_STATE_EOF(comentario1):
@@ -2177,7 +2189,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 203 "scanner.l"
+#line 215 "scanner.l"
 
 
 

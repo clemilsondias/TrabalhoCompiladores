@@ -48,11 +48,13 @@ extern int  yylineno;
 %token<symbol> TK_LIT_STRING
 %token<symbol> TK_IDENTIFICADOR
 %token TOKEN_ERRO
+
+
 %right '='
+%nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<'
+%left TK_OC_AND TK_OC_OR
 %left '+' '-'
 %left '*' '/'
-%left TK_OC_AND TK_OC_OR
-%nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<'
 
 
 %%
@@ -60,8 +62,8 @@ extern int  yylineno;
 
 
 /* regra inicial da gramática */
-s: declaracoes s { return IKS_SYNTAX_SUCESSO; }
-   |             { return IKS_SYNTAX_SUCESSO; };
+s: declaracoes s { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; }
+   |             { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; };
 
 /* regra de declaracoes */
 declaracoes: decl_variavel 
@@ -98,15 +100,19 @@ decl_locais: decl_variavel decl_locais
             | {printf("BISON -> decl locais\n");};
 
 /* regra para bloco de comandos entre chaves */
-bloco:   '{' comandos ';' '}' {printf("BISON -> bloco\n");}
-       | '{' '}';
+bloco:   '{' comandos '}' {printf("BISON -> bloco\n");}
+	 | '{' '}';
+ 
 
 /* regra para sequência de comandos*/
 comandos: comando_simples ';' comandos {printf("BISON -> comandos via simples\n");} 
-        | fluxo_controle comandos {printf("BISON -> comandos via fluxo\n");}
-        | bloco  {printf("BISON -> comandos bloco\n");} 
-        | ';'  {printf("BISON -> comandos so ponto e virgula\n");}; /*
-        | {printf("BISON -> comandos vazio\n");};   */
+        | fluxo_controle  comandos {printf("BISON -> comandos via fluxo\n");}
+	| comando_simples ';'
+	| fluxo_controle 
+        | bloco comandos {printf("BISON -> comandos bloco\n");} 
+	| bloco
+        | ';'  {printf("BISON -> comandos so ponto e virgula\n");};
+        /*| {printf("BISON -> comandos vazio\n");}; */
 
 /* regra para comando único em then e else (sem ponto e vírgula) */
 comando: comando_simples
@@ -114,7 +120,7 @@ comando: comando_simples
 
 /* comandos simples, ou seja, comando + ponto e vírgula */
 comando_simples: atribuicao 
-               | entrada 
+               | entrada
                | saida 
                | retorno 
                | chamada_funcao;
@@ -123,7 +129,7 @@ comando_simples: atribuicao
 atribuicao: TK_IDENTIFICADOR '=' expressao {printf("BISON -> atribuição de expressão: %s = \n",$1->chave);}
           | TK_IDENTIFICADOR '=' TK_LIT_STRING {printf("BISON -> atribuição de string: %s = %s\n",$1->chave,$3->chave);}
           | TK_IDENTIFICADOR '=' TK_LIT_CHAR {printf("BISON -> atribuição de char: %s = %s\n",$1->chave,$3->chave);}    
-          | TK_IDENTIFICADOR '[' expressao ']' '=' expressao {printf("BISON -> atribuição vetor expressao: %s = \n",$1->chave);}
+          | TK_IDENTIFICADOR '[' expressao ']' '=' expressao {printf("BISON -> atribuição vetor expressao: %s =\n",$1->chave);}
           | TK_IDENTIFICADOR '[' expressao ']' '=' TK_LIT_STRING {printf("BISON -> atribuição vetor string: %s = %s\n",$1->chave,$6->chave);}
           | TK_IDENTIFICADOR '[' expressao ']' '=' TK_LIT_CHAR {printf("BISON -> atribuição vetor char: %s = %s\n",$1->chave,$6->chave);};    
 
@@ -137,8 +143,7 @@ saida: TK_PR_OUTPUT lista_elementos {printf("BISON -> output\n");};
 lista_elementos: TK_LIT_STRING 
                | TK_LIT_STRING ',' lista_elementos 
                | expressao 
-               | expressao ',' lista_elementos 
-               |;
+               | expressao ',' lista_elementos;
 
 /* regra de retorno */
 retorno: TK_PR_RETURN expressao;
@@ -185,20 +190,24 @@ lista_argumentos: TK_LIT_CHAR
                 |;
 
 /* regras para fluxos de controle */
-fluxo_controle: TK_PR_IF '(' expressao ')' TK_PR_THEN then_else {printf("BISON -> IF sem else\n");}
-              | TK_PR_IF '(' expressao ')' TK_PR_THEN then TK_PR_ELSE then_else {printf("BISON -> IF com else\n");}
-              | TK_PR_WHILE '(' expressao ')' TK_PR_DO comandos {printf("BISON -> while\n");}
-              | TK_PR_DO comandos TK_PR_WHILE '(' expressao ')' {printf("BISON -> do while\n");};
+fluxo_controle: TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then_else {printf("BISON -> IF sem else\n");}
+              | TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then TK_PR_ELSE then_else {printf("BISON -> IF com else\n");}
+              | TK_PR_WHILE '(' expressao_logica ')' TK_PR_DO comandos_while_do ';' {printf("BISON -> while\n");}
+              | TK_PR_DO comandos_while_do TK_PR_WHILE '(' expressao_logica ')' ';' {printf("BISON -> do while\n");};
 
 /* regra para blocos de comandos de then e else*/
 then: comando {printf("BISON -> fim then comando\n");}
     | bloco {printf("BISON -> fim then bloco\n");};
 then_else: comando ';' {printf("BISON -> fim else comando\n");} 
          | bloco ';' {printf("BISON -> fim else bloco\n");};
+
+comandos_while_do: comando
+		| bloco;
+
 %%
 
-void yyerror (char const *mensagem)
+int yyerror (char const *mensagem)
 {
   fprintf (stderr, "ERRO %s na linha: %d\n",mensagem,yylineno);
-  return;
+  return IKS_SYNTAX_ERRO;
 }

@@ -30,3 +30,6 @@ void dicionarioRemove(comp_dict_t *Dicionario);
 void dicionarioImprime(comp_dict_t *Dicionario);
 int dicionarioQtdeItens(comp_dict_t *Dicionario);
 void dicionarioAtualizaLinha(comp_dict_t *Dicionario, char *chave, int novoValor);
+
+
+comp_dict_item_t* dicionarioRetornaChave(comp_dict_t *Dicionario, char *Chave);
