@@ -65,7 +65,7 @@ return 		{ return TK_PR_RETURN; }
 [\{] { return yytext[0]; }
 [\]] { return yytext[0]; }
 [\[] { return yytext[0]; }
-[;] { return yytext[0]; }
+[;] {printf("oiaeuaki\n"); return yytext[0]; }
 [-] { return yytext[0]; }
 [=] { return yytext[0]; }
 
@@ -89,6 +89,7 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_STRING;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_STRING; 
 			}
@@ -107,6 +108,7 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_INT;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_INT; 
 			}
@@ -124,6 +126,7 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_FLOAT;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
 				return TK_LIT_FLOAT; 
 			}
@@ -141,6 +144,7 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_FALSE;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_FALSE; 
 			}
@@ -158,6 +162,7 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_TRUE;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_TRUE; 
 			}
@@ -175,6 +180,7 @@ return 		{ return TK_PR_RETURN; }
 				return TK_LIT_CHAR;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
 				return TK_LIT_CHAR; 
 			}
@@ -191,13 +197,14 @@ return 		{ return TK_PR_RETURN; }
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario,itemDic);
 				
-				printf("----------\n\n");
-				dicionarioImprime(dicionario);
-				printf("\n\n----------\n\n");
+				//printf("----------\n\n");
+				//dicionarioImprime(dicionario);
+				//printf("\n\n----------\n\n");
 				
 				return TK_IDENTIFICADOR;
 			} else 
 			{
+				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
 				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
                                 return TK_IDENTIFICADOR;
 			}

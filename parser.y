@@ -62,13 +62,19 @@ extern int  yylineno;
 
 
 /* regra inicial da gramática */
-s: declaracoes s { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; }
-   |             { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; };
+s: k { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; };
+
+k: declaracoes k {printf("Tem mais decls...\n");}
+   |declaracoes {printf("Eh a ultima decl...\n");}
+   |erro {printf("Token de erro na entrada!\n"); return IKS_SYNTAX_ERRO;};
+
+erro: TOKEN_ERRO k
+      |TOKEN_ERRO;
 
 /* regra de declaracoes */
-declaracoes: decl_variavel 
-           | decl_vetor 
-           | decl_funcao;
+declaracoes: decl_variavel {printf("BISON -> é variável!\n");} 
+           | decl_vetor {printf("BISON -> eh vetor!\n");}
+           | decl_funcao {printf("BISON -> eh funcao!\n");};
 
 /* tipos de variáveis e vetores */
 tipo: TK_PR_INT 
@@ -86,22 +92,24 @@ decl_parametro: tipo ':' TK_IDENTIFICADOR {printf("BISON -> decl parametro sem s
               | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {printf("BISON -> decl parametro com separador: %s\n",$3->chave);};
 
 /* declaração de funções */
-decl_funcao: cabecalho decl_locais bloco {printf("BISON -> decl função\n");};
+decl_funcao: cabecalho decl_locais bloco {printf("BISON -> decl função\n");}
+	   | cabecalho bloco {printf("BISON -> decl funcao\n");};
 
 /* cabeçalho de função (linha da declaração) */
-cabecalho: tipo ':' TK_IDENTIFICADOR '(' parametros ')' {printf("BISON -> cabeçalho: %s\n",$3->chave);};
+cabecalho: tipo ':' TK_IDENTIFICADOR '(' parametros ')' {printf("BISON -> cabeçalho: %s\n",$3->chave);}
+	 | tipo ':' TK_IDENTIFICADOR '(' ')' {printf("BISON -> cabecalho sem parametros: %s\n", $3->chave);};
 
 /* regra que processa as declarações de parametros de funções, se existirem */
 parametros: decl_parametro parametros 
-            | {printf("BISON -> parametros\n");};
+	  | decl_parametro {printf("BISON -> parametros\n");};
 
 /* regra para declaração de variáveis locais de funções */
 decl_locais: decl_variavel decl_locais 
-            | {printf("BISON -> decl locais\n");};
+           | decl_variavel {printf("BISON -> decl locais\n");};
 
 /* regra para bloco de comandos entre chaves */
-bloco:   '{' comandos '}' {printf("BISON -> bloco\n");}
-       | '{' '}';
+bloco: '{' comandos '}' {printf("BISON -> bloco\n");}
+     | '{' '}';
  
 
 /* regra para sequência de comandos*/
