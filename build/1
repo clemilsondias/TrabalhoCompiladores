@@ -14,21 +14,17 @@ BISON -> eh vetor!
 ID. o texto é:f2
 ID. o texto é:x
 BISON -> decl parametro sem separador: x
-BISON -> parametros
 BISON -> cabeçalho: f2
-BISON -> decl locais
 literal int. o texto é:2
 BISON -> expressão literal int: 2
 ID. o texto é:x
 BISON -> expressão ID: x
 BISON -> aritmetica multiplicacao
 BISON -> bloco
-BISON -> decl função
+BISON -> decl funcao
 BISON -> eh funcao!
 ID. o texto é:my_function
-BISON -> parametros
-BISON -> cabeçalho: my_function
-BISON -> decl locais
+BISON -> cabecalho sem parametros: my_function
 ID. o texto é:v
 ID. o texto é:a
 BISON -> expressão ID: a

@@ -63,7 +63,8 @@
      TK_LIT_CHAR = 281,
      TK_LIT_STRING = 282,
      TK_IDENTIFICADOR = 283,
-     TOKEN_ERRO = 284
+     TOKEN_ERRO = 284,
+     TOKEN_EOF = 285
    };
 #endif
 
@@ -81,7 +82,7 @@ typedef union YYSTYPE
 
 
 /* Line 2068 of yacc.c  */
-#line 85 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h"
+#line 86 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

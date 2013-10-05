@@ -1,7 +1,6 @@
 /* COMPONENTES:
 	Clemilson Dias
-	Arthur Foscarini
-	Rafael Galuschka
+	Rafael da Fonte Lopes da Silva
 */
 
 #include <stdlib.h>

@@ -1179,21 +1179,23 @@ YY_RULE_SETUP
 			}
 		}
 	YY_BREAK
+case YY_STATE_EOF(INITIAL):
+case YY_STATE_EOF(comentario):
+case YY_STATE_EOF(comentario1):
+#line 213 "scanner.l"
+{return TOKEN_EOF;}
+	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 214 "scanner.l"
+#line 215 "scanner.l"
 { printf("Erro\n"); return TOKEN_ERRO; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 215 "scanner.l"
+#line 216 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1193 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
-case YY_STATE_EOF(INITIAL):
-case YY_STATE_EOF(comentario):
-case YY_STATE_EOF(comentario1):
-	yyterminate();
+#line 1199 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2189,7 +2191,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 215 "scanner.l"
+#line 216 "scanner.l"
 
 
 

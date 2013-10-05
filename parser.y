@@ -1,8 +1,7 @@
 %{
 /* COMPONENTES:
 	Clemilson Dias
-	Arthur Foscarini
-	Rafael Galuschka
+	Rafael da Fonte Lopes da Silva
 */
 
 
@@ -48,6 +47,7 @@ extern int  yylineno;
 %token<symbol> TK_LIT_STRING
 %token<symbol> TK_IDENTIFICADOR
 %token TOKEN_ERRO
+%token TOKEN_EOF
 
 
 %right '='
@@ -62,14 +62,10 @@ extern int  yylineno;
 
 
 /* regra inicial da gramática */
-s: k { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; };
+s: k TOKEN_EOF { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; };
 
 k: declaracoes k {printf("Tem mais decls...\n");}
-   |declaracoes {printf("Eh a ultima decl...\n");}
-   |erro {printf("Token de erro na entrada!\n"); return IKS_SYNTAX_ERRO;};
-
-erro: TOKEN_ERRO k
-      |TOKEN_ERRO;
+   |declaracoes {printf("Eh a ultima decl...\n");};
 
 /* regra de declaracoes */
 declaracoes: decl_variavel {printf("BISON -> é variável!\n");} 
@@ -96,12 +92,12 @@ decl_funcao: cabecalho decl_locais bloco {printf("BISON -> decl função\n");}
 	   | cabecalho bloco {printf("BISON -> decl funcao\n");};
 
 /* cabeçalho de função (linha da declaração) */
-cabecalho: tipo ':' TK_IDENTIFICADOR '(' parametros ')' {printf("BISON -> cabeçalho: %s\n",$3->chave);}
+cabecalho: tipo ':' TK_IDENTIFICADOR '(' decl_parametro ')' {printf("BISON -> cabeçalho: %s\n",$3->chave);}
 	 | tipo ':' TK_IDENTIFICADOR '(' ')' {printf("BISON -> cabecalho sem parametros: %s\n", $3->chave);};
 
 /* regra que processa as declarações de parametros de funções, se existirem */
-parametros: decl_parametro parametros 
-	  | decl_parametro {printf("BISON -> parametros\n");};
+/*parametros: decl_parametro parametros 
+	  | decl_parametro {printf("BISON -> parametros\n");};*/
 
 /* regra para declaração de variáveis locais de funções */
 decl_locais: decl_variavel decl_locais 
@@ -117,10 +113,9 @@ comandos: comando_simples ';' comandos {printf("BISON -> comandos via simples\n"
         | fluxo_controle  comandos {printf("BISON -> comandos via fluxo\n");}
 	| comando_simples ';'
 	| fluxo_controle 
-        | bloco comandos {printf("BISON -> comandos bloco\n");} 
+        | bloco ';' comandos {printf("BISON -> comandos bloco\n");} 
 	| bloco
         | ';'  {printf("BISON -> comandos so ponto e virgula\n");};
-        /*| {printf("BISON -> comandos vazio\n");}; */
 
 /* regra para comando único em then e else (sem ponto e vírgula) */
 comando: comando_simples

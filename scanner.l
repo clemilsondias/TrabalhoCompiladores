@@ -1,8 +1,7 @@
 %{
 /* COMPONENTES:
 	Clemilson Dias
-	Arthur Foscarini
-	Rafael Galuschka
+	Rafael da Fonte Lopes da Silva
 */
 
 #include <stdlib.h>
@@ -210,6 +209,7 @@ return 		{ return TK_PR_RETURN; }
 			}
 		}
 
+<<EOF>>		{return TOKEN_EOF;}
 
 . { printf("Erro\n"); return TOKEN_ERRO; }
 %%

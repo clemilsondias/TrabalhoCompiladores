@@ -65,7 +65,7 @@ return 		{ return TK_PR_RETURN; }
 [\{] { return yytext[0]; }
 [\]] { return yytext[0]; }
 [\[] { return yytext[0]; }
-[;] {printf("oiaeuaki\n"); return yytext[0]; }
+[;] { return yytext[0]; }
 [-] { return yytext[0]; }
 [=] { return yytext[0]; }
 
