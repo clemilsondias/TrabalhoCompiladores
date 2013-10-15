@@ -74,16 +74,30 @@ s: k TOKEN_EOF { printf("RECONHECEU ENTRADA!\n");
 		 arvoreInsereNodo($1,nodo_programa);
 		 return IKS_SYNTAX_SUCESSO; };
 
-k: declaracoes k {printf("Tem mais decls...\n");/*ADD NODE TO THE PARENT NODE, PASS PARENT NODE UP*/$$ = $2;}
-   |declaracoes {printf("Eh a ultima decl...\n");/*PASS NODE UP IF FUNCAO*/ $$ = $1;};
+k: declaracoes k {printf("Tem mais decls...\n");
+		  /*ADD NODE TO THE PARENT NODE, PASS PARENT NODE UP*/
+		  if($1 != NULL && $2 != NULL){
+			arvoreInsereNodo($1,$2);
+		  	$$ = $1;
+		  }
+		  else
+			$$ = $2;
+   		 }
+   |declaracoes {printf("Eh a ultima decl...\n");
+		 /*PASS NODE UP (Won't be NULL if it is a function node)*/
+		 $$ = $1;};
 
 /* regra de declaracoes */
-declaracoes: decl_variavel {printf("BISON -> é variável!\n"); $$ = NULL;} 
-           | decl_vetor {printf("BISON -> eh vetor!\n"); $$ = NULL;}
+declaracoes: decl_variavel {printf("BISON -> é variável!\n");
+			    $$ = NULL;
+			   } 
+           | decl_vetor {printf("BISON -> eh vetor!\n");
+			 $$ = NULL;
+			}
            | decl_funcao {printf("BISON -> eh funcao!\n");
 			  comp_tree_t * nodo_funcao = arvoreCriaNodo(2/*FILHOS - 2? Comando + proxima funcao?*/,IKS_AST_FUNCAO);/*PASS NODE UP*/
-			 $$ = nodo_funcao; 
-			};
+			  $$ = nodo_funcao; 
+			 };
 
 /* tipos de variáveis e vetores */
 tipo: TK_PR_INT
@@ -101,8 +115,16 @@ decl_parametro: tipo ':' TK_IDENTIFICADOR {printf("BISON -> decl parametro sem s
               | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {printf("BISON -> decl parametro com separador: %s\n",$3->chave);/*MAKE NODE, ADD CHILDREN NODES*/};
 
 /* declaração de funções */
-decl_funcao: cabecalho decl_locais bloco {printf("BISON -> decl função\n");}
-	   | cabecalho bloco {printf("BISON -> decl funcao\n");};
+decl_funcao: cabecalho decl_locais bloco {printf("BISON -> decl função\n");
+						/*Passar os nodos de comandos por aqui!!*/
+						$$ = $3;//Algo assim...
+
+					 }
+	   | cabecalho bloco {printf("BISON -> decl funcao\n");
+			
+				/*Mesma coisa aqui...*/
+				$$ = $2;
+			     };
 
 /* cabeçalho de função (linha da declaração) */
 cabecalho: tipo ':' TK_IDENTIFICADOR '(' decl_parametro ')' {printf("BISON -> cabeçalho: %s\n",$3->chave);}
