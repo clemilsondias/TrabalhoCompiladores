@@ -18,6 +18,11 @@ extern int  yylineno;
   comp_dict_item_t* symbol; 
 };
 
+%union
+{
+ comp_tree_t * tree_node;
+};
+
  
 /* Declaração dos tokens da gramática da Linguagem K */
 %token TK_PR_INT
@@ -48,7 +53,8 @@ extern int  yylineno;
 %token<symbol> TK_IDENTIFICADOR
 %token TOKEN_ERRO
 %token TOKEN_EOF
-
+%type <tree_node> k
+%type <tree_node> declaracoes
 
 %right '='
 %nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<'
@@ -62,21 +68,28 @@ extern int  yylineno;
 
 
 /* regra inicial da gramática */
-s: k TOKEN_EOF { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; };
+s: k TOKEN_EOF { printf("RECONHECEU ENTRADA!\n");
+		 printf("Valor de retorno: %p, Eh funcao: %d\n",$1, $1->tipo == IKS_AST_FUNCAO);
+		 comp_tree_t * nodo_programa = arvoreCriaNodo(1/*NUMERO DE FILHOS?? 1??*/,IKS_AST_PROGRAMA);
+		 arvoreInsereNodo($1,nodo_programa);
+		 return IKS_SYNTAX_SUCESSO; };
 
-k: declaracoes k {printf("Tem mais decls...\n");}
-   |declaracoes {printf("Eh a ultima decl...\n");};
+k: declaracoes k {printf("Tem mais decls...\n");/*ADD NODE TO THE PARENT NODE, PASS PARENT NODE UP*/$$ = $2;}
+   |declaracoes {printf("Eh a ultima decl...\n");/*PASS NODE UP IF FUNCAO*/ $$ = $1;};
 
 /* regra de declaracoes */
-declaracoes: decl_variavel {printf("BISON -> é variável!\n");} 
-           | decl_vetor {printf("BISON -> eh vetor!\n");}
-           | decl_funcao {printf("BISON -> eh funcao!\n");};
+declaracoes: decl_variavel {printf("BISON -> é variável!\n"); $$ = NULL;} 
+           | decl_vetor {printf("BISON -> eh vetor!\n"); $$ = NULL;}
+           | decl_funcao {printf("BISON -> eh funcao!\n");
+			  comp_tree_t * nodo_funcao = arvoreCriaNodo(2/*FILHOS - 2? Comando + proxima funcao?*/,IKS_AST_FUNCAO);/*PASS NODE UP*/
+			 $$ = nodo_funcao; 
+			};
 
 /* tipos de variáveis e vetores */
-tipo: TK_PR_INT 
-    | TK_PR_FLOAT 
-    | TK_PR_BOOL 
-    | TK_PR_CHAR 
+tipo: TK_PR_INT
+    | TK_PR_FLOAT
+    | TK_PR_BOOL
+    | TK_PR_CHAR
     | TK_PR_STRING {printf("BISON -> tipo\n");};
 
 /* declarações de variáveis e vetores */
@@ -84,8 +97,8 @@ decl_variavel: tipo ':' TK_IDENTIFICADOR ';' {printf("BISON -> decl variavel: %s
 decl_vetor: tipo ':' TK_IDENTIFICADOR '[' TK_LIT_INT ']' ';' {printf("BISON -> decl vetor: %s\n",$3->chave);};
 
 /* declaracao de parametro de função */
-decl_parametro: tipo ':' TK_IDENTIFICADOR {printf("BISON -> decl parametro sem separador: %s\n",$3->chave);}
-              | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {printf("BISON -> decl parametro com separador: %s\n",$3->chave);};
+decl_parametro: tipo ':' TK_IDENTIFICADOR {printf("BISON -> decl parametro sem separador: %s\n",$3->chave);/*MAKE NODE, PASS UP*/}
+              | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {printf("BISON -> decl parametro com separador: %s\n",$3->chave);/*MAKE NODE, ADD CHILDREN NODES*/};
 
 /* declaração de funções */
 decl_funcao: cabecalho decl_locais bloco {printf("BISON -> decl função\n");}

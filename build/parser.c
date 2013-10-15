@@ -70,8 +70,7 @@
 
 /* COMPONENTES:
 	Clemilson Dias
-	Arthur Foscarini
-	Rafael Galuschka
+	Rafael da Fonte Lopes da Silva
 */
 
 
@@ -84,7 +83,7 @@ extern int  yylineno;
 
 
 /* Line 268 of yacc.c  */
-#line 88 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
+#line 87 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -149,14 +148,20 @@ typedef union YYSTYPE
 {
 
 /* Line 293 of yacc.c  */
-#line 18 "parser.y"
+#line 17 "parser.y"
  
   comp_dict_item_t* symbol; 
 
 
+/* Line 293 of yacc.c  */
+#line 22 "parser.y"
+
+ comp_tree_t * tree_node;
+
+
 
 /* Line 293 of yacc.c  */
-#line 160 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
+#line 165 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -168,7 +173,7 @@ typedef union YYSTYPE
 
 
 /* Line 343 of yacc.c  */
-#line 172 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
+#line 177 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
 
 #ifdef short
 # undef short
@@ -496,16 +501,16 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    66,    66,    68,    69,    72,    73,    74,    77,    78,
-      79,    80,    81,    84,    85,    88,    89,    92,    93,    96,
-      97,   104,   105,   108,   109,   113,   114,   115,   116,   117,
-     118,   119,   122,   123,   126,   127,   128,   129,   130,   133,
-     134,   135,   136,   137,   138,   141,   144,   147,   148,   149,
-     150,   153,   156,   159,   160,   161,   162,   165,   166,   167,
-     168,   169,   170,   171,   174,   175,   176,   177,   178,   179,
-     180,   181,   182,   183,   184,   185,   188,   189,   190,   191,
-     192,   193,   194,   197,   198,   199,   200,   203,   204,   205,
-     206,   208,   209
+       0,    71,    71,    77,    78,    81,    82,    83,    89,    90,
+      91,    92,    93,    96,    97,   100,   101,   104,   105,   108,
+     109,   116,   117,   120,   121,   125,   126,   127,   128,   129,
+     130,   131,   134,   135,   138,   139,   140,   141,   142,   145,
+     146,   147,   148,   149,   150,   153,   156,   159,   160,   161,
+     162,   165,   168,   171,   172,   173,   174,   177,   178,   179,
+     180,   181,   182,   183,   186,   187,   188,   189,   190,   191,
+     192,   193,   194,   195,   196,   197,   200,   201,   202,   203,
+     204,   205,   206,   209,   210,   211,   212,   215,   216,   217,
+     218,   220,   221
 };
 #endif
 
@@ -1579,343 +1584,350 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 66 "parser.y"
-    { printf("RECONHECEU ENTRADA!\n"); return IKS_SYNTAX_SUCESSO; }
+#line 71 "parser.y"
+    { printf("RECONHECEU ENTRADA!\n");
+		 printf("Valor de retorno: %p, Eh funcao: %d\n",(yyvsp[(1) - (2)].tree_node), (yyvsp[(1) - (2)].tree_node)->tipo == IKS_AST_FUNCAO);
+		 comp_tree_t * nodo_programa = arvoreCriaNodo(1/*NUMERO DE FILHOS?? 1??*/,IKS_AST_PROGRAMA);
+		 arvoreInsereNodo((yyvsp[(1) - (2)].tree_node),nodo_programa);
+		 return IKS_SYNTAX_SUCESSO; }
     break;
 
   case 3:
 
 /* Line 1806 of yacc.c  */
-#line 68 "parser.y"
-    {printf("Tem mais decls...\n");}
+#line 77 "parser.y"
+    {printf("Tem mais decls...\n");/*ADD NODE TO THE PARENT NODE, PASS PARENT NODE UP*/(yyval.tree_node) = (yyvsp[(2) - (2)].tree_node);}
     break;
 
   case 4:
 
 /* Line 1806 of yacc.c  */
-#line 69 "parser.y"
-    {printf("Eh a ultima decl...\n");}
+#line 78 "parser.y"
+    {printf("Eh a ultima decl...\n");/*PASS NODE UP IF FUNCAO*/ (yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
     break;
 
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 72 "parser.y"
-    {printf("BISON -> é variável!\n");}
+#line 81 "parser.y"
+    {printf("BISON -> é variável!\n"); (yyval.tree_node) = NULL;}
     break;
 
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 73 "parser.y"
-    {printf("BISON -> eh vetor!\n");}
+#line 82 "parser.y"
+    {printf("BISON -> eh vetor!\n"); (yyval.tree_node) = NULL;}
     break;
 
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 74 "parser.y"
-    {printf("BISON -> eh funcao!\n");}
+#line 83 "parser.y"
+    {printf("BISON -> eh funcao!\n");
+			  comp_tree_t * nodo_funcao = arvoreCriaNodo(2/*FILHOS - 2? Comando + proxima funcao?*/,IKS_AST_FUNCAO);/*PASS NODE UP*/
+			 (yyval.tree_node) = nodo_funcao; 
+			}
     break;
 
   case 12:
 
 /* Line 1806 of yacc.c  */
-#line 81 "parser.y"
+#line 93 "parser.y"
     {printf("BISON -> tipo\n");}
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 84 "parser.y"
+#line 96 "parser.y"
     {printf("BISON -> decl variavel: %s\n",(yyvsp[(3) - (4)].symbol)->chave);}
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 85 "parser.y"
+#line 97 "parser.y"
     {printf("BISON -> decl vetor: %s\n",(yyvsp[(3) - (7)].symbol)->chave);}
     break;
 
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 88 "parser.y"
-    {printf("BISON -> decl parametro sem separador: %s\n",(yyvsp[(3) - (3)].symbol)->chave);}
+#line 100 "parser.y"
+    {printf("BISON -> decl parametro sem separador: %s\n",(yyvsp[(3) - (3)].symbol)->chave);/*MAKE NODE, PASS UP*/}
     break;
 
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 89 "parser.y"
-    {printf("BISON -> decl parametro com separador: %s\n",(yyvsp[(3) - (5)].symbol)->chave);}
+#line 101 "parser.y"
+    {printf("BISON -> decl parametro com separador: %s\n",(yyvsp[(3) - (5)].symbol)->chave);/*MAKE NODE, ADD CHILDREN NODES*/}
     break;
 
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 92 "parser.y"
+#line 104 "parser.y"
     {printf("BISON -> decl função\n");}
     break;
 
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 93 "parser.y"
+#line 105 "parser.y"
     {printf("BISON -> decl funcao\n");}
     break;
 
   case 19:
 
 /* Line 1806 of yacc.c  */
-#line 96 "parser.y"
+#line 108 "parser.y"
     {printf("BISON -> cabeçalho: %s\n",(yyvsp[(3) - (6)].symbol)->chave);}
     break;
 
   case 20:
 
 /* Line 1806 of yacc.c  */
-#line 97 "parser.y"
+#line 109 "parser.y"
     {printf("BISON -> cabecalho sem parametros: %s\n", (yyvsp[(3) - (5)].symbol)->chave);}
     break;
 
   case 22:
 
 /* Line 1806 of yacc.c  */
-#line 105 "parser.y"
+#line 117 "parser.y"
     {printf("BISON -> decl locais\n");}
     break;
 
   case 23:
 
 /* Line 1806 of yacc.c  */
-#line 108 "parser.y"
+#line 120 "parser.y"
     {printf("BISON -> bloco\n");}
     break;
 
   case 25:
 
 /* Line 1806 of yacc.c  */
-#line 113 "parser.y"
+#line 125 "parser.y"
     {printf("BISON -> comandos via simples\n");}
     break;
 
   case 26:
 
 /* Line 1806 of yacc.c  */
-#line 114 "parser.y"
+#line 126 "parser.y"
     {printf("BISON -> comandos via fluxo\n");}
     break;
 
   case 29:
 
 /* Line 1806 of yacc.c  */
-#line 117 "parser.y"
+#line 129 "parser.y"
     {printf("BISON -> comandos bloco\n");}
     break;
 
   case 31:
 
 /* Line 1806 of yacc.c  */
-#line 119 "parser.y"
+#line 131 "parser.y"
     {printf("BISON -> comandos so ponto e virgula\n");}
     break;
 
   case 39:
 
 /* Line 1806 of yacc.c  */
-#line 133 "parser.y"
+#line 145 "parser.y"
     {printf("BISON -> atribuição de expressão: %s = \n",(yyvsp[(1) - (3)].symbol)->chave);}
     break;
 
   case 40:
 
 /* Line 1806 of yacc.c  */
-#line 134 "parser.y"
+#line 146 "parser.y"
     {printf("BISON -> atribuição de string: %s = %s\n",(yyvsp[(1) - (3)].symbol)->chave,(yyvsp[(3) - (3)].symbol)->chave);}
     break;
 
   case 41:
 
 /* Line 1806 of yacc.c  */
-#line 135 "parser.y"
+#line 147 "parser.y"
     {printf("BISON -> atribuição de char: %s = %s\n",(yyvsp[(1) - (3)].symbol)->chave,(yyvsp[(3) - (3)].symbol)->chave);}
     break;
 
   case 42:
 
 /* Line 1806 of yacc.c  */
-#line 136 "parser.y"
+#line 148 "parser.y"
     {printf("BISON -> atribuição vetor expressao: %s =\n",(yyvsp[(1) - (6)].symbol)->chave);}
     break;
 
   case 43:
 
 /* Line 1806 of yacc.c  */
-#line 137 "parser.y"
+#line 149 "parser.y"
     {printf("BISON -> atribuição vetor string: %s = %s\n",(yyvsp[(1) - (6)].symbol)->chave,(yyvsp[(6) - (6)].symbol)->chave);}
     break;
 
   case 44:
 
 /* Line 1806 of yacc.c  */
-#line 138 "parser.y"
+#line 150 "parser.y"
     {printf("BISON -> atribuição vetor char: %s = %s\n",(yyvsp[(1) - (6)].symbol)->chave,(yyvsp[(6) - (6)].symbol)->chave);}
     break;
 
   case 46:
 
 /* Line 1806 of yacc.c  */
-#line 144 "parser.y"
+#line 156 "parser.y"
     {printf("BISON -> output\n");}
     break;
 
   case 52:
 
 /* Line 1806 of yacc.c  */
-#line 156 "parser.y"
+#line 168 "parser.y"
     { printf("BISON -> chamada de função: %s\n",(yyvsp[(1) - (4)].symbol)->chave);}
     break;
 
   case 53:
 
 /* Line 1806 of yacc.c  */
-#line 159 "parser.y"
+#line 171 "parser.y"
     { printf("BISON -> aritmetica soma\n");}
     break;
 
   case 54:
 
 /* Line 1806 of yacc.c  */
-#line 160 "parser.y"
+#line 172 "parser.y"
     { printf("BISON -> aritmetica subtração\n");}
     break;
 
   case 55:
 
 /* Line 1806 of yacc.c  */
-#line 161 "parser.y"
+#line 173 "parser.y"
     { printf("BISON -> aritmetica multiplicacao\n");}
     break;
 
   case 56:
 
 /* Line 1806 of yacc.c  */
-#line 162 "parser.y"
+#line 174 "parser.y"
     { printf("BISON -> aritmetica divisao\n");}
     break;
 
   case 60:
 
 /* Line 1806 of yacc.c  */
-#line 168 "parser.y"
+#line 180 "parser.y"
     {printf("BISON -> teste igualdade\n");}
     break;
 
   case 61:
 
 /* Line 1806 of yacc.c  */
-#line 169 "parser.y"
+#line 181 "parser.y"
     {printf("BISON -> teste desigualdade\n");}
     break;
 
   case 67:
 
 /* Line 1806 of yacc.c  */
-#line 177 "parser.y"
+#line 189 "parser.y"
     { printf("BISON -> expressão vetor\n");}
     break;
 
   case 68:
 
 /* Line 1806 of yacc.c  */
-#line 178 "parser.y"
+#line 190 "parser.y"
     { printf("BISON -> expressão ID: %s\n",(yyvsp[(1) - (1)].symbol)->chave);}
     break;
 
   case 69:
 
 /* Line 1806 of yacc.c  */
-#line 179 "parser.y"
+#line 191 "parser.y"
     { printf("BISON -> expressão literal int: %s\n",(yyvsp[(1) - (1)].symbol)->chave);}
     break;
 
   case 70:
 
 /* Line 1806 of yacc.c  */
-#line 180 "parser.y"
+#line 192 "parser.y"
     { printf("BISON -> expressão literal int negativo: %s\n",(yyvsp[(2) - (2)].symbol)->chave);}
     break;
 
   case 73:
 
 /* Line 1806 of yacc.c  */
-#line 183 "parser.y"
+#line 195 "parser.y"
     { printf("BISON -> expressão literal float: %s\n",(yyvsp[(1) - (1)].symbol)->chave);}
     break;
 
   case 83:
 
 /* Line 1806 of yacc.c  */
-#line 197 "parser.y"
+#line 209 "parser.y"
     {printf("BISON -> IF sem else\n");}
     break;
 
   case 84:
 
 /* Line 1806 of yacc.c  */
-#line 198 "parser.y"
+#line 210 "parser.y"
     {printf("BISON -> IF com else\n");}
     break;
 
   case 85:
 
 /* Line 1806 of yacc.c  */
-#line 199 "parser.y"
+#line 211 "parser.y"
     {printf("BISON -> while\n");}
     break;
 
   case 86:
 
 /* Line 1806 of yacc.c  */
-#line 200 "parser.y"
+#line 212 "parser.y"
     {printf("BISON -> do while\n");}
     break;
 
   case 87:
 
 /* Line 1806 of yacc.c  */
-#line 203 "parser.y"
+#line 215 "parser.y"
     {printf("BISON -> fim then comando\n");}
     break;
 
   case 88:
 
 /* Line 1806 of yacc.c  */
-#line 204 "parser.y"
+#line 216 "parser.y"
     {printf("BISON -> fim then bloco\n");}
     break;
 
   case 89:
 
 /* Line 1806 of yacc.c  */
-#line 205 "parser.y"
+#line 217 "parser.y"
     {printf("BISON -> fim else comando\n");}
     break;
 
   case 90:
 
 /* Line 1806 of yacc.c  */
-#line 206 "parser.y"
+#line 218 "parser.y"
     {printf("BISON -> fim else bloco\n");}
     break;
 
 
 
 /* Line 1806 of yacc.c  */
-#line 1919 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
+#line 1931 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2146,7 +2158,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 211 "parser.y"
+#line 223 "parser.y"
 
 
 int yyerror (char const *mensagem)

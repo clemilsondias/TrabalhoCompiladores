@@ -544,8 +544,7 @@ char *yytext;
 #line 2 "scanner.l"
 /* COMPONENTES:
 	Clemilson Dias
-	Arthur Foscarini
-	Rafael Galuschka
+	Rafael da Fonte Lopes da Silva
 */
 
 #include <stdlib.h>
@@ -562,7 +561,7 @@ int LineNumber = 1;
 
 
 
-#line 566 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
+#line 565 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 #define INITIAL 0
 #define comentario 1
@@ -751,9 +750,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 34 "scanner.l"
+#line 33 "scanner.l"
 
-#line 757 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
+#line 756 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -838,196 +837,196 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 35 "scanner.l"
+#line 34 "scanner.l"
 BEGIN(comentario);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 37 "scanner.l"
+#line 36 "scanner.l"
 /* consome qualquer coisa que não seja '*' */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 38 "scanner.l"
+#line 37 "scanner.l"
 /* consome todos os '*' que não são seguidos de '/' */
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 39 "scanner.l"
+#line 38 "scanner.l"
 ++LineNumber;++yylineno;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 40 "scanner.l"
+#line 39 "scanner.l"
 BEGIN(INITIAL);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 42 "scanner.l"
+#line 41 "scanner.l"
 BEGIN(comentario1);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 44 "scanner.l"
+#line 43 "scanner.l"
 /* consome qualquer coisa que não seja '/' */
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 45 "scanner.l"
+#line 44 "scanner.l"
 ++LineNumber;++yylineno;BEGIN(INITIAL);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 47 "scanner.l"
+#line 46 "scanner.l"
 /* espaços */
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 49 "scanner.l"
+#line 48 "scanner.l"
 { /* printf("reservada int\n"); */ return TK_PR_INT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 50 "scanner.l"
+#line 49 "scanner.l"
 { /* printf("reservada float\n"); */ return TK_PR_FLOAT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 51 "scanner.l"
+#line 50 "scanner.l"
 { return TK_PR_BOOL; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 52 "scanner.l"
+#line 51 "scanner.l"
 { /* printf("reservada char\n");*/ return TK_PR_CHAR; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 53 "scanner.l"
+#line 52 "scanner.l"
 { /* printf("reservada string\n"); */ return TK_PR_STRING; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 54 "scanner.l"
+#line 53 "scanner.l"
 { /* printf("IF\n"); */ return TK_PR_IF; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 55 "scanner.l"
+#line 54 "scanner.l"
 { /* printf("then \n");*/ return TK_PR_THEN; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 56 "scanner.l"
+#line 55 "scanner.l"
 { /* printf("else \n"); */ return TK_PR_ELSE; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 57 "scanner.l"
+#line 56 "scanner.l"
 { /* printf("while \n"); */ return TK_PR_WHILE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 58 "scanner.l"
+#line 57 "scanner.l"
 { return TK_PR_DO; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 59 "scanner.l"
+#line 58 "scanner.l"
 { return TK_PR_INPUT; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 59 "scanner.l"
 { /* printf("output\n"); */ return TK_PR_OUTPUT; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 61 "scanner.l"
+#line 60 "scanner.l"
 { return TK_PR_RETURN; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 63 "scanner.l"
+#line 62 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 64 "scanner.l"
+#line 63 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 65 "scanner.l"
+#line 64 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 65 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 67 "scanner.l"
+#line 66 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 68 "scanner.l"
+#line 67 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 69 "scanner.l"
+#line 68 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 70 "scanner.l"
+#line 69 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 72 "scanner.l"
+#line 71 "scanner.l"
 { return TK_OC_LE; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 73 "scanner.l"
+#line 72 "scanner.l"
 { return TK_OC_GE; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 74 "scanner.l"
+#line 73 "scanner.l"
 { return TK_OC_EQ; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 75 "scanner.l"
+#line 74 "scanner.l"
 { return TK_OC_NE; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 76 "scanner.l"
+#line 75 "scanner.l"
 { return TK_OC_AND; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 77 "scanner.l"
+#line 76 "scanner.l"
 { return TK_OC_OR; }
 	YY_BREAK
 case 37:
 /* rule 37 can match eol */
 YY_RULE_SETUP
-#line 78 "scanner.l"
+#line 77 "scanner.l"
 {++LineNumber;++yylineno;}
 	YY_BREAK
 case 38:
 /* rule 38 can match eol */
 YY_RULE_SETUP
-#line 80 "scanner.l"
+#line 79 "scanner.l"
 {
 			printf("string. o texto é:%s\n",yytext);					
 			if (!dicionarioExiste(dicionario))
@@ -1048,7 +1047,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 99 "scanner.l"
+#line 98 "scanner.l"
 { 
 			printf("literal int. o texto é:%s\n",yytext);
 			if (!dicionarioExiste(dicionario))
@@ -1069,7 +1068,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 117 "scanner.l"
+#line 116 "scanner.l"
 {
 			printf("lit float. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
@@ -1090,7 +1089,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 135 "scanner.l"
+#line 134 "scanner.l"
 { 
 			printf("lit false. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
@@ -1111,7 +1110,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 153 "scanner.l"
+#line 152 "scanner.l"
 { 
 			printf("lit true. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
@@ -1133,7 +1132,7 @@ YY_RULE_SETUP
 case 43:
 /* rule 43 can match eol */
 YY_RULE_SETUP
-#line 171 "scanner.l"
+#line 170 "scanner.l"
 { 
 			printf("lit char. o texto é:%s\n",yytext);				
 			if (!dicionarioExiste(dicionario))
@@ -1154,7 +1153,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 189 "scanner.l"
+#line 188 "scanner.l"
 {
 			printf("ID. o texto é:%s\n",yytext);
 			if (!dicionarioExiste(dicionario))
@@ -1182,20 +1181,20 @@ YY_RULE_SETUP
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comentario):
 case YY_STATE_EOF(comentario1):
-#line 213 "scanner.l"
+#line 212 "scanner.l"
 {return TOKEN_EOF;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 215 "scanner.l"
+#line 214 "scanner.l"
 { printf("Erro\n"); return TOKEN_ERRO; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 216 "scanner.l"
+#line 215 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1199 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
+#line 1198 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2191,7 +2190,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 216 "scanner.l"
+#line 215 "scanner.l"
 
 
 
