@@ -53,9 +53,10 @@ extern int  yylineno;
 %token<symbol> TK_IDENTIFICADOR
 %token TOKEN_ERRO
 %token TOKEN_EOF
-%type <tree_node> k
-%type <tree_node> declaracoes
-
+%type <tree_node> k declaracoes decl_funcao bloco expressao
+		  retorno saida entrada comandos comando_simples
+		  atribuicao lista_elementos chamada_funcao lista_argumentos
+		  fluxo_controle
 %right '='
 %nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<'
 %left TK_OC_AND TK_OC_OR
@@ -104,7 +105,7 @@ tipo: TK_PR_INT
     | TK_PR_FLOAT
     | TK_PR_BOOL
     | TK_PR_CHAR
-    | TK_PR_STRING {printf("BISON -> tipo\n");};
+    | TK_PR_STRING;
 
 /* declarações de variáveis e vetores */
 decl_variavel: tipo ':' TK_IDENTIFICADOR ';' {printf("BISON -> decl variavel: %s\n",$3->chave);};
@@ -115,123 +116,211 @@ decl_parametro: tipo ':' TK_IDENTIFICADOR {printf("BISON -> decl parametro sem s
               | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {printf("BISON -> decl parametro com separador: %s\n",$3->chave);/*MAKE NODE, ADD CHILDREN NODES*/};
 
 /* declaração de funções */
-decl_funcao: cabecalho decl_locais bloco {printf("BISON -> decl função\n");
+decl_funcao: cabecalho decl_locais bloco {
 						/*Passar os nodos de comandos por aqui!!*/
 						$$ = $3;//Algo assim...
-
 					 }
-	   | cabecalho bloco {printf("BISON -> decl funcao\n");
-			
+	   | cabecalho bloco {
 				/*Mesma coisa aqui...*/
 				$$ = $2;
 			     };
 
 /* cabeçalho de função (linha da declaração) */
-cabecalho: tipo ':' TK_IDENTIFICADOR '(' decl_parametro ')' {printf("BISON -> cabeçalho: %s\n",$3->chave);}
-	 | tipo ':' TK_IDENTIFICADOR '(' ')' {printf("BISON -> cabecalho sem parametros: %s\n", $3->chave);};
+cabecalho: tipo ':' TK_IDENTIFICADOR '(' decl_parametro ')'
+	 | tipo ':' TK_IDENTIFICADOR '(' ')';
 
-/* regra que processa as declarações de parametros de funções, se existirem */
-/*parametros: decl_parametro parametros 
-	  | decl_parametro {printf("BISON -> parametros\n");};*/
 
 /* regra para declaração de variáveis locais de funções */
 decl_locais: decl_variavel decl_locais 
-           | decl_variavel {printf("BISON -> decl locais\n");};
+           | decl_variavel;
 
 /* regra para bloco de comandos entre chaves */
-bloco: '{' comandos '}' {printf("BISON -> bloco\n");}
-     | '{' '}';
+bloco: '{' comandos '}' {
+				comp_tree_t * nodo_bloco = arvoreCriaNodo(2,IKS_AST_BLOCO);//Filhos: comandos dentro do bloco e proximo comando.
+				arvoreInsereNodo(nodo_bloco,$2);//Insere o nodo vindo de comandos. 
+				$$ = nodo_bloco;
+			}
+     | '{' '}' {
+			$$ = arvoreCriaNodo(1,IKS_AST_BLOCO);//Somente um filho - o proximo comando, que sera definido um nivel acima.
+	       };
  
 
 /* regra para sequência de comandos*/
-comandos: comando_simples ';' comandos {printf("BISON -> comandos via simples\n");} 
-        | fluxo_controle  comandos {printf("BISON -> comandos via fluxo\n");}
-	| comando_simples ';'
-	| fluxo_controle 
-        | bloco ';' comandos {printf("BISON -> comandos bloco\n");} 
-	| bloco
-        | ';'  {printf("BISON -> comandos so ponto e virgula\n");};
+comandos: comando_simples ';' comandos 	{
+						arvoreInsereNodo($1,$3);
+						$$ = $1;
+					}
+        | fluxo_controle  comandos	{
+						arvoreInsereNodo($1,$2);
+						$$ = $1;
+					}
+	| comando_simples ';'		{
+						$$ = $1;
+					}
+	| fluxo_controle 		{
+						$$ = $1;
+					}
+        | bloco ';' comandos		{
+						arvoreInsereNodo($1,$3);
+						$$ = $1;
+					}
+	| bloco				{
+						$$ = $1;
+					}
+        | ';'				{
+						$$ = NULL;				
+	};
 
 /* regra para comando único em then e else (sem ponto e vírgula) */
 comando: comando_simples
 	| fluxo_controle;
 
 /* comandos simples, ou seja, comando + ponto e vírgula */
-comando_simples: atribuicao 
-               | entrada
-               | saida 
-               | retorno 
-               | chamada_funcao;
+comando_simples: atribuicao		{$$ = $1;}
+               | entrada		{$$ = $1;}
+               | saida 			{$$ = $1;}
+               | retorno 		{$$ = $1;}
+               | chamada_funcao		{$$ = $1;};
 
 /* regra para atribuições */
-atribuicao: TK_IDENTIFICADOR '=' expressao {printf("BISON -> atribuição de expressão: %s = \n",$1->chave);}
-          | TK_IDENTIFICADOR '=' TK_LIT_STRING {printf("BISON -> atribuição de string: %s = %s\n",$1->chave,$3->chave);}
-          | TK_IDENTIFICADOR '=' TK_LIT_CHAR {printf("BISON -> atribuição de char: %s = %s\n",$1->chave,$3->chave);}    
-          | TK_IDENTIFICADOR '[' expressao ']' '=' expressao {printf("BISON -> atribuição vetor expressao: %s =\n",$1->chave);}
-          | TK_IDENTIFICADOR '[' expressao ']' '=' TK_LIT_STRING {printf("BISON -> atribuição vetor string: %s = %s\n",$1->chave,$6->chave);}
-          | TK_IDENTIFICADOR '[' expressao ']' '=' TK_LIT_CHAR {printf("BISON -> atribuição vetor char: %s = %s\n",$1->chave,$6->chave);};    
+atribuicao: TK_IDENTIFICADOR '=' expressao				{	//TODO: ADICIONAR PONTEIROS PARA A TABELA DE SIMBOLOS NOS NODOS!!!
+										$$ = arvoreCriaNodo(3,IKS_AST_IDENTIFICADOR); //AST_IDENTIFICADOR||AST_INDEXADO + EXPRESSAO + prox comando
+									 	
+									}
+          | TK_IDENTIFICADOR '=' TK_LIT_STRING				{
+										$$ = arvoreCriaNodo(3,IKS_AST_IDENTIFICADOR);
+									}
+          | TK_IDENTIFICADOR '=' TK_LIT_CHAR				{
+										$$ = arvoreCriaNodo(3,IKS_AST_IDENTIFICADOR);
+									}
+          | TK_IDENTIFICADOR '[' expressao ']' '=' expressao		{
+										$$ = arvoreCriaNodo(3,IKS_AST_VETOR_INDEXADO);
+									};
 
 /* regra de input */
-entrada: TK_PR_INPUT TK_IDENTIFICADOR;
+entrada: TK_PR_INPUT TK_IDENTIFICADOR 	{
+						$$ = arvoreCriaNodo(2,IKS_AST_INPUT);
+						arvoreInsereNodo($$,arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR));
+					};
 
 /* regra de output*/
-saida: TK_PR_OUTPUT lista_elementos {printf("BISON -> output\n");};
+saida: TK_PR_OUTPUT lista_elementos	{
+						$$ = arvoreCriaNodo(2,IKS_AST_OUTPUT);
+						arvoreInsereNodo($$,$2);
+					};
 
 /* lista de elementos de output */
-lista_elementos: TK_LIT_STRING 
-               | TK_LIT_STRING ',' lista_elementos 
-               | expressao 
-               | expressao ',' lista_elementos;
+lista_elementos: TK_LIT_STRING	{
+					$$ = arvoreCriaNodo(0,IKS_AST_LITERAL);//SERA O ULTIMO DA LISTA...
+				} 
+               | TK_LIT_STRING ',' lista_elementos 	{
+								$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
+								arvoreInsereNodo($$,$3);
+							}
+               | expressao 				{
+								$$ = $1;
+							}
+               | expressao ',' lista_elementos		{	//TODO: PODE-SE TER A OPCAO DE TER MAIS FILHOS PARA A EXPRESSAO!! ALOCAR UM APONTADOR AO MENOS!!
+								arvoreInsereNodo($1,$3);
+								$$ = $1;
+							};
 
 /* regra de retorno */
-retorno: TK_PR_RETURN expressao;
+retorno: TK_PR_RETURN expressao	{
+					$$ = arvoreCriaNodo(2,IKS_AST_RETURN);
+					arvoreInsereNodo($$,$2);
+				};
 
 /* regra para chamada de função */
-chamada_funcao: TK_IDENTIFICADOR '(' lista_argumentos ')' { printf("BISON -> chamada de função: %s\n",$1->chave);};
+chamada_funcao:   TK_IDENTIFICADOR '(' lista_argumentos ')' 	{ 
+									$$ = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);
+									arvoreInsereNodo($$,$3);
+								}
+		| TK_IDENTIFICADOR '(' ')' 	{
+							$$ = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);//TODO: REVIEW
+						};
 
 /* regra para expressão aritmética */
-expressao_aritmetica: expressao '+' expressao { printf("BISON -> aritmetica soma\n");}
-                    | expressao '-' expressao { printf("BISON -> aritmetica subtração\n");}
-                    | expressao '*' expressao { printf("BISON -> aritmetica multiplicacao\n");}
-                    | expressao '/' expressao { printf("BISON -> aritmetica divisao\n");};
+expressao_aritmetica: expressao '+' expressao	{ 
+
+						}
+                    | expressao '-' expressao	{ 
+
+						}
+                    | expressao '*' expressao	{ 
+
+						}
+                    | expressao '/' expressao	{
+
+						};
 
 /* regra para expressão lógica */
-expressao_logica: expressao TK_OC_LE expressao 
-                | expressao TK_OC_GE expressao 
-                | expressao '<' expressao  
-                | expressao TK_OC_EQ expressao {printf("BISON -> teste igualdade\n");} 
-                | expressao TK_OC_NE expressao {printf("BISON -> teste desigualdade\n");}
-                | expressao TK_OC_AND expressao 
-                | expressao TK_OC_OR expressao;
+expressao_logica: expressao TK_OC_LE expressao	{
+							
+						}
+                | expressao TK_OC_GE expressao	{
+							
+						}
+                | expressao '<' expressao	{
+							
+						}
+                | expressao TK_OC_EQ expressao	{
+							
+						} 
+                | expressao TK_OC_NE expressao	{
+							
+						}
+                | expressao TK_OC_AND expressao	{
+							
+						}
+                | expressao TK_OC_OR expressao	{
+							
+						};
 
 /* regra para expressões em geral */
-expressao: expressao_aritmetica 
-         | expressao_logica 
-         | '(' expressao ')'
-         | TK_IDENTIFICADOR '[' expressao ']' { printf("BISON -> expressão vetor\n");}
-         | TK_IDENTIFICADOR { printf("BISON -> expressão ID: %s\n",$1->chave);}
-         | TK_LIT_INT { printf("BISON -> expressão literal int: %s\n",$1->chave);}
-         | '-' TK_LIT_INT { printf("BISON -> expressão literal int negativo: %s\n",$2->chave);}
-         | TK_LIT_TRUE 
-         | TK_LIT_FALSE  
-         | TK_LIT_FLOAT { printf("BISON -> expressão literal float: %s\n",$1->chave);}
-         | '-' TK_LIT_FLOAT  
-         | chamada_funcao;
+expressao: expressao_aritmetica	{
+				}
+         | expressao_logica	{
+				}
+         | '(' expressao ')'	{
+				}
+         | TK_IDENTIFICADOR '[' expressao ']'	{
+						}
+         | TK_IDENTIFICADOR	{
+				}
+         | TK_LIT_INT	{
+			}
+         | '-' TK_LIT_INT	{
+				}
+         | TK_LIT_TRUE	{
+			}
+         | TK_LIT_FALSE	{
+			} 
+         | TK_LIT_FLOAT	{
+			}
+         | '-' TK_LIT_FLOAT	{
+				}  
+         | chamada_funcao	{
+				}
+	 | TK_LIT_STRING	{
+				}
+	 | TK_LIT_CHAR	{
+			};
 
 /* regra para lista de argumentos de chamadas de funções */
-lista_argumentos: TK_LIT_CHAR
-                | TK_LIT_CHAR ',' lista_argumentos 
-                | TK_LIT_STRING 
-                | TK_LIT_STRING ',' lista_argumentos 
-                | expressao 
-                | expressao ',' lista_argumentos 
-                |;
+lista_argumentos: expressao 	{
+					$$ = $1;
+				}
+                | expressao ',' lista_argumentos	{
+								$$ = $1;
+								arvoreInsereNodo($1,$3);
+							};
 
 /* regras para fluxos de controle */
-fluxo_controle: TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then_else {printf("BISON -> IF sem else\n");}
-              | TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then TK_PR_ELSE then_else {printf("BISON -> IF com else\n");}
-              | TK_PR_WHILE '(' expressao_logica ')' TK_PR_DO comandos_while_do ';' {printf("BISON -> while\n");}
-              | TK_PR_DO comandos_while_do TK_PR_WHILE '(' expressao_logica ')' ';' {printf("BISON -> do while\n");};
+fluxo_controle: TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then_else { }
+              | TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then TK_PR_ELSE then_else { }
+              | TK_PR_WHILE '(' expressao_logica ')' TK_PR_DO comandos_while_do ';' { }
+              | TK_PR_DO comandos_while_do TK_PR_WHILE '(' expressao_logica ')' ';' { };
 
 /* regra para blocos de comandos de then e else*/
 then: comando {printf("BISON -> fim then comando\n");}
