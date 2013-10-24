@@ -56,13 +56,14 @@ extern int  yylineno;
 %type <tree_node> k declaracoes decl_funcao bloco expressao
 		  retorno saida entrada comandos comando_simples
 		  atribuicao lista_elementos chamada_funcao lista_argumentos
-		  fluxo_controle
+		  fluxo_controle expressao_aritmetica expressao_logica
+		  comando then then_else comandos_while_do
 %right '='
-%nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<'
+%nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<' '>'
 %left TK_OC_AND TK_OC_OR
 %left '+' '-'
 %left '*' '/'
-
+%right '!'
 
 %%
  /* Regras (e ações) da gramática da Linguagem K */
@@ -70,9 +71,11 @@ extern int  yylineno;
 
 /* regra inicial da gramática */
 s: k TOKEN_EOF { printf("RECONHECEU ENTRADA!\n");
-		 printf("Valor de retorno: %p, Eh funcao: %d\n",$1, $1->tipo == IKS_AST_FUNCAO);
-		 comp_tree_t * nodo_programa = arvoreCriaNodo(1/*NUMERO DE FILHOS?? 1??*/,IKS_AST_PROGRAMA);
-		 arvoreInsereNodo($1,nodo_programa);
+		 if($1 != NULL){
+			 printf("Valor de retorno: %p, Eh funcao: %d\n",$1, $1->tipo == IKS_AST_FUNCAO);
+			 //comp_tree_t * nodo_programa = arvoreCriaNodo(1/*NUMERO DE FILHOS?? 1??*/,IKS_AST_PROGRAMA);
+		 	 //arvoreInsereNodo(nodo_programa,$1);
+		 }
 		 return IKS_SYNTAX_SUCESSO; };
 
 k: declaracoes k {printf("Tem mais decls...\n");
@@ -172,8 +175,8 @@ comandos: comando_simples ';' comandos 	{
 	};
 
 /* regra para comando único em then e else (sem ponto e vírgula) */
-comando: comando_simples
-	| fluxo_controle;
+comando: comando_simples {$$ = $1;}
+	| fluxo_controle {$$ = $1;};
 
 /* comandos simples, ou seja, comando + ponto e vírgula */
 comando_simples: atribuicao		{$$ = $1;}
@@ -186,12 +189,6 @@ comando_simples: atribuicao		{$$ = $1;}
 atribuicao: TK_IDENTIFICADOR '=' expressao				{	//TODO: ADICIONAR PONTEIROS PARA A TABELA DE SIMBOLOS NOS NODOS!!!
 										$$ = arvoreCriaNodo(3,IKS_AST_IDENTIFICADOR); //AST_IDENTIFICADOR||AST_INDEXADO + EXPRESSAO + prox comando
 									 	
-									}
-          | TK_IDENTIFICADOR '=' TK_LIT_STRING				{
-										$$ = arvoreCriaNodo(3,IKS_AST_IDENTIFICADOR);
-									}
-          | TK_IDENTIFICADOR '=' TK_LIT_CHAR				{
-										$$ = arvoreCriaNodo(3,IKS_AST_IDENTIFICADOR);
 									}
           | TK_IDENTIFICADOR '[' expressao ']' '=' expressao		{
 										$$ = arvoreCriaNodo(3,IKS_AST_VETOR_INDEXADO);
@@ -210,14 +207,7 @@ saida: TK_PR_OUTPUT lista_elementos	{
 					};
 
 /* lista de elementos de output */
-lista_elementos: TK_LIT_STRING	{
-					$$ = arvoreCriaNodo(0,IKS_AST_LITERAL);//SERA O ULTIMO DA LISTA...
-				} 
-               | TK_LIT_STRING ',' lista_elementos 	{
-								$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
-								arvoreInsereNodo($$,$3);
-							}
-               | expressao 				{
+lista_elementos: expressao 				{
 								$$ = $1;
 							}
                | expressao ',' lista_elementos		{	//TODO: PODE-SE TER A OPCAO DE TER MAIS FILHOS PARA A EXPRESSAO!! ALOCAR UM APONTADOR AO MENOS!!
@@ -242,69 +232,103 @@ chamada_funcao:   TK_IDENTIFICADOR '(' lista_argumentos ')' 	{
 
 /* regra para expressão aritmética */
 expressao_aritmetica: expressao '+' expressao	{ 
-
+							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_SOMA);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 						}
                     | expressao '-' expressao	{ 
+							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_SUBTRACAO);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 
 						}
                     | expressao '*' expressao	{ 
+							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_MULTIPLICACAO);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 
 						}
                     | expressao '/' expressao	{
+							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_DIVISAO);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 
+						}
+		    | '-' expressao 		{
+							$$ = arvoreCriaNodo(1,IKS_AST_ARIM_INVERSAO);
+							arvoreInsereNodo($$,$2);
 						};
 
 /* regra para expressão lógica */
 expressao_logica: expressao TK_OC_LE expressao	{
-							
+							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_LE);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 						}
                 | expressao TK_OC_GE expressao	{
-							
+							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_GE);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 						}
                 | expressao '<' expressao	{
-							
+							//Useless...
+						}
+		| expressao '>' expressao	{
+							//Useless...
 						}
                 | expressao TK_OC_EQ expressao	{
-							
+							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_IGUAL);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 						} 
                 | expressao TK_OC_NE expressao	{
-							
+							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_DIF);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 						}
                 | expressao TK_OC_AND expressao	{
-							
+							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_E);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
 						}
                 | expressao TK_OC_OR expressao	{
-							
+							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_OU);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
+						}
+		| '!' expressao 		{
+							$$ = arvoreCriaNodo(1,IKS_AST_LOGICO_COMP_NEGACAO);
+							 arvoreInsereNodo($$,$2);
 						};
 
 /* regra para expressões em geral */
-expressao: expressao_aritmetica	{
+expressao: expressao_aritmetica	{	$$ = $1;
 				}
-         | expressao_logica	{
+         | expressao_logica	{	$$ = $1;
 				}
          | '(' expressao ')'	{
+					$$ = $2;
 				}
-         | TK_IDENTIFICADOR '[' expressao ']'	{
+         | TK_IDENTIFICADOR '[' expressao ']'	{	$$ = arvoreCriaNodo(2,IKS_AST_VETOR_INDEXADO);
+							comp_tree_t * id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);//TODO: Fix this...ponteiro para a tabela de simbolos
+							arvoreInsereNodo($$,id);
+							arvoreInsereNodo($$,$3);
 						}
-         | TK_IDENTIFICADOR	{
+         | TK_IDENTIFICADOR	{//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
 				}
-         | TK_LIT_INT	{
+         | TK_LIT_INT	{	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
 			}
-         | '-' TK_LIT_INT	{
-				}
-         | TK_LIT_TRUE	{
+         | TK_LIT_TRUE	{	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
 			}
-         | TK_LIT_FALSE	{
+         | TK_LIT_FALSE	{	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
 			} 
-         | TK_LIT_FLOAT	{
+         | TK_LIT_FLOAT	{	//TODO: ponteiro para a tabela de simbolos
 			}
-         | '-' TK_LIT_FLOAT	{
-				}  
-         | chamada_funcao	{
+         | chamada_funcao	{	$$ = $1;
 				}
-	 | TK_LIT_STRING	{
+	 | TK_LIT_STRING	{//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
 				}
-	 | TK_LIT_CHAR	{
+	 | TK_LIT_CHAR	{	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
 			};
 
 /* regra para lista de argumentos de chamadas de funções */
@@ -317,19 +341,50 @@ lista_argumentos: expressao 	{
 							};
 
 /* regras para fluxos de controle */
-fluxo_controle: TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then_else { }
-              | TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then TK_PR_ELSE then_else { }
-              | TK_PR_WHILE '(' expressao_logica ')' TK_PR_DO comandos_while_do ';' { }
-              | TK_PR_DO comandos_while_do TK_PR_WHILE '(' expressao_logica ')' ';' { };
+fluxo_controle: TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then_else	{
+										$$ = arvoreCriaNodo(4,IKS_AST_IF_ELSE);
+										arvoreInsereNodo($$,$3);//Condicao
+										arvoreInsereNodo($$,$6);//Comando, se verdade
+										$$->filhos[2] = NULL;//Comando, se falso //TODO : REVIEW THIS!!!!
+									}
+              | TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then TK_PR_ELSE then_else 	{ 
+												$$ = arvoreCriaNodo(4,IKS_AST_IF_ELSE);
+												arvoreInsereNodo($$,$3);//Condicao
+												arvoreInsereNodo($$,$6);//Comando, se verdade
+												arvoreInsereNodo($$,$8);//Comando, se falso
+											}
+              | TK_PR_WHILE '(' expressao_logica ')' TK_PR_DO comandos_while_do ';'	{
+												$$ = arvoreCriaNodo(3,IKS_AST_WHILE_DO);
+												arvoreInsereNodo($$,$3);//Condicao
+												arvoreInsereNodo($$,$6);//Comando
+											}
+              | TK_PR_DO comandos_while_do TK_PR_WHILE '(' expressao_logica ')' ';' 	{
+												$$ = arvoreCriaNodo(3,IKS_AST_DO_WHILE);
+												arvoreInsereNodo($$,$2);//Comando
+												arvoreInsereNodo($$,$5);//Condicao
+											
+											};
 
 /* regra para blocos de comandos de then e else*/
-then: comando {printf("BISON -> fim then comando\n");}
-    | bloco {printf("BISON -> fim then bloco\n");};
-then_else: comando ';' {printf("BISON -> fim else comando\n");} 
-         | bloco ';' {printf("BISON -> fim else bloco\n");};
+then: comando	{
+			$$ = $1;
+		}
+    | bloco	{
+			$$ = $1;
+		};
+then_else: comando ';'	{
+				$$ = $1;
+			} 
+         | bloco ';' 	{
+				$$ = $1;
+			};
 
-comandos_while_do: comando
-		| bloco;
+comandos_while_do: comando	{
+					$$ = $1;
+				}
+		| bloco		{
+					$$ = $1;
+				};
 
 %%
 
