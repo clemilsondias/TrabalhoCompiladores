@@ -61,6 +61,7 @@ then
 	echo "erro!!!\n"
 fi
 
+echo "isELEVEN\n"
 ./main < ../../../Etapa\ 2/compiladores/input/certa11.txt > saida.txt
 if test $? = 1
 then

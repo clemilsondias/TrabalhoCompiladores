@@ -7,7 +7,7 @@
 typedef struct comp_tree_t {
    int qtdeFilhos;
    int tipo;
-   struct comp_dict_item_t *pt_tabela;
+   struct comp_dict_t * pt_tabela;
    struct comp_tree_t *filhos[];
 } comp_tree_t;
 

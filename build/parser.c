@@ -75,7 +75,7 @@
 
 
 #include <stdio.h>
-//#include "../include/comp_dict.h"
+#include <string.h>
 #include "../include/main.h"
 
 extern int  yylineno;
@@ -497,15 +497,15 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    73,    73,    81,    90,    95,    98,   101,   107,   108,
-     109,   110,   111,   114,   115,   118,   119,   122,   126,   132,
-     133,   137,   138,   141,   146,   152,   156,   160,   163,   166,
-     170,   173,   178,   179,   182,   183,   184,   185,   186,   189,
-     193,   198,   204,   210,   213,   219,   225,   229,   234,   239,
-     245,   251,   257,   263,   268,   273,   276,   279,   284,   289,
-     294,   299,   305,   307,   309,   312,   317,   319,   321,   323,
-     325,   327,   329,   331,   335,   338,   344,   350,   356,   361,
-     369,   372,   375,   378,   382,   385
+       0,    74,    74,    84,    94,    99,   102,   105,   110,   111,
+     112,   113,   114,   117,   118,   121,   122,   125,   133,   143,
+     144,   148,   149,   152,   159,   166,   173,   180,   183,   186,
+     193,   196,   201,   202,   205,   206,   207,   208,   209,   212,
+     224,   244,   250,   256,   259,   267,   275,   287,   299,   307,
+     316,   325,   334,   342,   350,   358,   366,   374,   382,   390,
+     398,   406,   414,   416,   418,   421,   432,   438,   443,   448,
+     453,   458,   460,   477,   484,   487,   494,   503,   513,   521,
+     531,   534,   537,   540,   544,   547
 };
 #endif
 
@@ -1578,12 +1578,14 @@ yyreduce:
         case 2:
 
 /* Line 1806 of yacc.c  */
-#line 73 "parser.y"
+#line 74 "parser.y"
     { printf("RECONHECEU ENTRADA!\n");
 		 if((yyvsp[(1) - (2)].tree_node) != NULL){
 			 printf("Valor de retorno: %p, Eh funcao: %d\n",(yyvsp[(1) - (2)].tree_node), (yyvsp[(1) - (2)].tree_node)->tipo == IKS_AST_FUNCAO);
-			 //comp_tree_t * nodo_programa = arvoreCriaNodo(1/*NUMERO DE FILHOS?? 1??*/,IKS_AST_PROGRAMA);
-		 	 //arvoreInsereNodo(nodo_programa,$1);
+			 comp_tree_t * nodo_programa = arvoreCriaNodo(1,IKS_AST_PROGRAMA);
+			 arvoreInsereNodo(nodo_programa,(yyvsp[(1) - (2)].tree_node));
+		 	 gv_declare(IKS_AST_PROGRAMA,(const void*)nodo_programa,NULL);
+			 gv_connect(nodo_programa,(yyvsp[(1) - (2)].tree_node));
 		 }
 		 return IKS_SYNTAX_SUCESSO; }
     break;
@@ -1591,12 +1593,13 @@ yyreduce:
   case 3:
 
 /* Line 1806 of yacc.c  */
-#line 81 "parser.y"
+#line 84 "parser.y"
     {printf("Tem mais decls...\n");
 		  /*ADD NODE TO THE PARENT NODE, PASS PARENT NODE UP*/
 		  if((yyvsp[(1) - (2)].tree_node) != NULL && (yyvsp[(2) - (2)].tree_node) != NULL){
 			arvoreInsereNodo((yyvsp[(1) - (2)].tree_node),(yyvsp[(2) - (2)].tree_node));
 		  	(yyval.tree_node) = (yyvsp[(1) - (2)].tree_node);
+			gv_connect((yyvsp[(1) - (2)].tree_node),(yyvsp[(2) - (2)].tree_node));
 		  }
 		  else
 			(yyval.tree_node) = (yyvsp[(2) - (2)].tree_node);
@@ -1606,7 +1609,7 @@ yyreduce:
   case 4:
 
 /* Line 1806 of yacc.c  */
-#line 90 "parser.y"
+#line 94 "parser.y"
     {printf("Eh a ultima decl...\n");
 		 /*PASS NODE UP (Won't be NULL if it is a function node)*/
 		 (yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
@@ -1615,7 +1618,7 @@ yyreduce:
   case 5:
 
 /* Line 1806 of yacc.c  */
-#line 95 "parser.y"
+#line 99 "parser.y"
     {printf("BISON -> é variável!\n");
 			    (yyval.tree_node) = NULL;
 			   }
@@ -1624,7 +1627,7 @@ yyreduce:
   case 6:
 
 /* Line 1806 of yacc.c  */
-#line 98 "parser.y"
+#line 102 "parser.y"
     {printf("BISON -> eh vetor!\n");
 			 (yyval.tree_node) = NULL;
 			}
@@ -1633,87 +1636,114 @@ yyreduce:
   case 7:
 
 /* Line 1806 of yacc.c  */
-#line 101 "parser.y"
+#line 105 "parser.y"
     {printf("BISON -> eh funcao!\n");
-			  comp_tree_t * nodo_funcao = arvoreCriaNodo(2/*FILHOS - 2? Comando + proxima funcao?*/,IKS_AST_FUNCAO);/*PASS NODE UP*/
-			  (yyval.tree_node) = nodo_funcao; 
+			  (yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 			 }
     break;
 
   case 13:
 
 /* Line 1806 of yacc.c  */
-#line 114 "parser.y"
+#line 117 "parser.y"
     {printf("BISON -> decl variavel: %s\n",(yyvsp[(3) - (4)].symbol)->chave);}
     break;
 
   case 14:
 
 /* Line 1806 of yacc.c  */
-#line 115 "parser.y"
+#line 118 "parser.y"
     {printf("BISON -> decl vetor: %s\n",(yyvsp[(3) - (7)].symbol)->chave);}
     break;
 
   case 15:
 
 /* Line 1806 of yacc.c  */
-#line 118 "parser.y"
+#line 121 "parser.y"
     {printf("BISON -> decl parametro sem separador: %s\n",(yyvsp[(3) - (3)].symbol)->chave);/*MAKE NODE, PASS UP*/}
     break;
 
   case 16:
 
 /* Line 1806 of yacc.c  */
-#line 119 "parser.y"
+#line 122 "parser.y"
     {printf("BISON -> decl parametro com separador: %s\n",(yyvsp[(3) - (5)].symbol)->chave);/*MAKE NODE, ADD CHILDREN NODES*/}
     break;
 
   case 17:
 
 /* Line 1806 of yacc.c  */
-#line 122 "parser.y"
+#line 125 "parser.y"
     {
 						/*Passar os nodos de comandos por aqui!!*/
-						(yyval.tree_node) = (yyvsp[(3) - (3)].tree_node);//Algo assim...
+						(yyval.tree_node) = arvoreCriaNodo(2/*FILHOS - 2? Comando + proxima funcao?*/,IKS_AST_FUNCAO);/*PASS NODE UP*/
+						(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (3)].symbol);
+						arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+						gv_declare(IKS_AST_FUNCAO,(const void*)(yyval.tree_node),((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave);
+						gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 					 }
     break;
 
   case 18:
 
 /* Line 1806 of yacc.c  */
-#line 126 "parser.y"
+#line 133 "parser.y"
     {
 				/*Mesma coisa aqui...*/
-				(yyval.tree_node) = (yyvsp[(2) - (2)].tree_node);
+				(yyval.tree_node) = arvoreCriaNodo(2,IKS_AST_FUNCAO);
+				(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (2)].symbol);
+				arvoreInsereNodo((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
+				gv_declare(IKS_AST_FUNCAO,(const void*)(yyval.tree_node),((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave);
+				gv_connect((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
 			     }
+    break;
+
+  case 19:
+
+/* Line 1806 of yacc.c  */
+#line 143 "parser.y"
+    {(yyval.symbol) = (yyvsp[(3) - (6)].symbol);}
+    break;
+
+  case 20:
+
+/* Line 1806 of yacc.c  */
+#line 144 "parser.y"
+    {(yyval.symbol) = (yyvsp[(3) - (5)].symbol);}
     break;
 
   case 23:
 
 /* Line 1806 of yacc.c  */
-#line 141 "parser.y"
+#line 152 "parser.y"
     {
 				comp_tree_t * nodo_bloco = arvoreCriaNodo(2,IKS_AST_BLOCO);//Filhos: comandos dentro do bloco e proximo comando.
 				arvoreInsereNodo(nodo_bloco,(yyvsp[(2) - (3)].tree_node));//Insere o nodo vindo de comandos. 
 				(yyval.tree_node) = nodo_bloco;
+				gv_declare(IKS_AST_BLOCO,(const void*)(yyval.tree_node),NULL);
+				gv_connect((yyval.tree_node),(yyvsp[(2) - (3)].tree_node));
 			}
     break;
 
   case 24:
 
 /* Line 1806 of yacc.c  */
-#line 146 "parser.y"
+#line 159 "parser.y"
     {
 			(yyval.tree_node) = arvoreCriaNodo(1,IKS_AST_BLOCO);//Somente um filho - o proximo comando, que sera definido um nivel acima.
+			gv_declare(IKS_AST_BLOCO,(const void*)(yyval.tree_node),NULL);
 	       }
     break;
 
   case 25:
 
 /* Line 1806 of yacc.c  */
-#line 152 "parser.y"
+#line 166 "parser.y"
     {
-						arvoreInsereNodo((yyvsp[(1) - (3)].tree_node),(yyvsp[(3) - (3)].tree_node));
+						if((yyvsp[(3) - (3)].tree_node) != NULL){
+							arvoreInsereNodo((yyvsp[(1) - (3)].tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_connect((yyvsp[(1) - (3)].tree_node),(yyvsp[(3) - (3)].tree_node));
+						}
 						(yyval.tree_node) = (yyvsp[(1) - (3)].tree_node);
 					}
     break;
@@ -1721,9 +1751,12 @@ yyreduce:
   case 26:
 
 /* Line 1806 of yacc.c  */
-#line 156 "parser.y"
+#line 173 "parser.y"
     {
-						arvoreInsereNodo((yyvsp[(1) - (2)].tree_node),(yyvsp[(2) - (2)].tree_node));
+						if((yyvsp[(2) - (2)].tree_node) != NULL){
+							arvoreInsereNodo((yyvsp[(1) - (2)].tree_node),(yyvsp[(2) - (2)].tree_node));
+							gv_connect((yyvsp[(1) - (2)].tree_node),(yyvsp[(2) - (2)].tree_node));
+						}
 						(yyval.tree_node) = (yyvsp[(1) - (2)].tree_node);
 					}
     break;
@@ -1731,7 +1764,7 @@ yyreduce:
   case 27:
 
 /* Line 1806 of yacc.c  */
-#line 160 "parser.y"
+#line 180 "parser.y"
     {
 						(yyval.tree_node) = (yyvsp[(1) - (2)].tree_node);
 					}
@@ -1740,7 +1773,7 @@ yyreduce:
   case 28:
 
 /* Line 1806 of yacc.c  */
-#line 163 "parser.y"
+#line 183 "parser.y"
     {
 						(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 					}
@@ -1749,9 +1782,12 @@ yyreduce:
   case 29:
 
 /* Line 1806 of yacc.c  */
-#line 166 "parser.y"
+#line 186 "parser.y"
     {
-						arvoreInsereNodo((yyvsp[(1) - (3)].tree_node),(yyvsp[(3) - (3)].tree_node));
+						if((yyvsp[(3) - (3)].tree_node) != NULL){
+							arvoreInsereNodo((yyvsp[(1) - (3)].tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_connect((yyvsp[(1) - (3)].tree_node),(yyvsp[(3) - (3)].tree_node));
+						}
 						(yyval.tree_node) = (yyvsp[(1) - (3)].tree_node);
 					}
     break;
@@ -1759,7 +1795,7 @@ yyreduce:
   case 30:
 
 /* Line 1806 of yacc.c  */
-#line 170 "parser.y"
+#line 193 "parser.y"
     {
 						(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 					}
@@ -1768,84 +1804,107 @@ yyreduce:
   case 31:
 
 /* Line 1806 of yacc.c  */
-#line 173 "parser.y"
+#line 196 "parser.y"
     {
 						(yyval.tree_node) = NULL;				
-	}
+					}
     break;
 
   case 32:
 
 /* Line 1806 of yacc.c  */
-#line 178 "parser.y"
+#line 201 "parser.y"
     {(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
     break;
 
   case 33:
 
 /* Line 1806 of yacc.c  */
-#line 179 "parser.y"
+#line 202 "parser.y"
     {(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
     break;
 
   case 34:
 
 /* Line 1806 of yacc.c  */
-#line 182 "parser.y"
+#line 205 "parser.y"
     {(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
     break;
 
   case 35:
 
 /* Line 1806 of yacc.c  */
-#line 183 "parser.y"
+#line 206 "parser.y"
     {(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
     break;
 
   case 36:
 
 /* Line 1806 of yacc.c  */
-#line 184 "parser.y"
+#line 207 "parser.y"
     {(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
     break;
 
   case 37:
 
 /* Line 1806 of yacc.c  */
-#line 185 "parser.y"
+#line 208 "parser.y"
     {(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
     break;
 
   case 38:
 
 /* Line 1806 of yacc.c  */
-#line 186 "parser.y"
+#line 209 "parser.y"
     {(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);}
     break;
 
   case 39:
 
 /* Line 1806 of yacc.c  */
-#line 189 "parser.y"
+#line 212 "parser.y"
     {	//TODO: ADICIONAR PONTEIROS PARA A TABELA DE SIMBOLOS NOS NODOS!!!
-										(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_IDENTIFICADOR); //AST_IDENTIFICADOR||AST_INDEXADO + EXPRESSAO + prox comando
-									 	
+										(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_ATRIBUICAO);
+										comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR); //AST_IDENTIFICADOR||AST_INDEXADO + EXPRESSAO + prox comando
+										id->pt_tabela = (yyvsp[(1) - (3)].symbol);
+										arvoreInsereNodo((yyval.tree_node),id);
+										arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+
+										gv_declare(IKS_AST_ATRIBUICAO,(const void*)(yyval.tree_node),NULL);
+										gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+										gv_connect((yyval.tree_node),id);
+										gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 									}
     break;
 
   case 40:
 
 /* Line 1806 of yacc.c  */
-#line 193 "parser.y"
+#line 224 "parser.y"
     {
-										(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_VETOR_INDEXADO);
-									}
+										(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_ATRIBUICAO);
+										comp_tree_t* idx = arvoreCriaNodo(2,IKS_AST_VETOR_INDEXADO);
+										comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR); //AST_IDENTIFICADOR||AST_INDEXADO + EXPRESSAO + prox comando
+										id->pt_tabela = (yyvsp[(1) - (6)].symbol);
+										arvoreInsereNodo((yyval.tree_node),idx);
+										arvoreInsereNodo((yyval.tree_node),(yyvsp[(6) - (6)].tree_node));
+										arvoreInsereNodo(idx,id);
+										arvoreInsereNodo(idx,(yyvsp[(3) - (6)].tree_node));
+
+										gv_declare(IKS_AST_ATRIBUICAO,(const void*)(yyval.tree_node),NULL);
+										gv_declare(IKS_AST_VETOR_INDEXADO,(const void*)idx,NULL);
+										gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+										gv_connect((yyval.tree_node),idx);
+										gv_connect((yyval.tree_node),(yyvsp[(6) - (6)].tree_node));
+										gv_connect(idx,id);
+										gv_connect(idx,(yyvsp[(3) - (6)].tree_node));
+								}
     break;
 
   case 41:
 
 /* Line 1806 of yacc.c  */
-#line 198 "parser.y"
+#line 244 "parser.y"
     {
 						(yyval.tree_node) = arvoreCriaNodo(2,IKS_AST_INPUT);
 						arvoreInsereNodo((yyval.tree_node),arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR));
@@ -1855,7 +1914,7 @@ yyreduce:
   case 42:
 
 /* Line 1806 of yacc.c  */
-#line 204 "parser.y"
+#line 250 "parser.y"
     {
 						(yyval.tree_node) = arvoreCriaNodo(2,IKS_AST_OUTPUT);
 						arvoreInsereNodo((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
@@ -1865,7 +1924,7 @@ yyreduce:
   case 43:
 
 /* Line 1806 of yacc.c  */
-#line 210 "parser.y"
+#line 256 "parser.y"
     {
 								(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 							}
@@ -1874,61 +1933,86 @@ yyreduce:
   case 44:
 
 /* Line 1806 of yacc.c  */
-#line 213 "parser.y"
+#line 259 "parser.y"
     {	//TODO: PODE-SE TER A OPCAO DE TER MAIS FILHOS PARA A EXPRESSAO!! ALOCAR UM APONTADOR AO MENOS!!
 								arvoreInsereNodo((yyvsp[(1) - (3)].tree_node),(yyvsp[(3) - (3)].tree_node));
 								(yyval.tree_node) = (yyvsp[(1) - (3)].tree_node);
+								
+								gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 							}
     break;
 
   case 45:
 
 /* Line 1806 of yacc.c  */
-#line 219 "parser.y"
+#line 267 "parser.y"
     {
 					(yyval.tree_node) = arvoreCriaNodo(2,IKS_AST_RETURN);
 					arvoreInsereNodo((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
+					gv_declare(IKS_AST_RETURN,(const void*)(yyval.tree_node),NULL);
+					gv_connect((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
 				}
     break;
 
   case 46:
 
 /* Line 1806 of yacc.c  */
-#line 225 "parser.y"
+#line 275 "parser.y"
     { 
 									(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);
+									comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
+									id->pt_tabela = (yyvsp[(1) - (4)].symbol);
+									arvoreInsereNodo((yyval.tree_node),id);
 									arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (4)].tree_node));
+
+									gv_declare(IKS_AST_CHAMADA_DE_FUNCAO,(const void*)(yyval.tree_node),NULL);
+									gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+									gv_connect((yyval.tree_node),id);
+									gv_connect((yyval.tree_node),(yyvsp[(3) - (4)].tree_node));
 								}
     break;
 
   case 47:
 
 /* Line 1806 of yacc.c  */
-#line 229 "parser.y"
+#line 287 "parser.y"
     {
-							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);//TODO: REVIEW
+							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);
+							comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
+							id->pt_tabela = (yyvsp[(1) - (3)].symbol);
+							arvoreInsereNodo((yyval.tree_node),id);
+
+							gv_declare(IKS_AST_CHAMADA_DE_FUNCAO,(const void*)(yyval.tree_node),NULL);
+							gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+							gv_connect((yyval.tree_node),id);
 						}
     break;
 
   case 48:
 
 /* Line 1806 of yacc.c  */
-#line 234 "parser.y"
+#line 299 "parser.y"
     { 
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_ARIM_SOMA);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_ARIM_SOMA,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 49:
 
 /* Line 1806 of yacc.c  */
-#line 239 "parser.y"
+#line 307 "parser.y"
     { 
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_ARIM_SUBTRACAO);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_ARIM_SUBTRACAO,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 
 						}
     break;
@@ -1936,11 +2020,14 @@ yyreduce:
   case 50:
 
 /* Line 1806 of yacc.c  */
-#line 245 "parser.y"
+#line 316 "parser.y"
     { 
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_ARIM_MULTIPLICACAO);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_ARIM_MULTIPLICACAO,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 
 						}
     break;
@@ -1948,11 +2035,14 @@ yyreduce:
   case 51:
 
 /* Line 1806 of yacc.c  */
-#line 251 "parser.y"
+#line 325 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_ARIM_DIVISAO);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_ARIM_DIVISAO,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 
 						}
     break;
@@ -1960,111 +2050,143 @@ yyreduce:
   case 52:
 
 /* Line 1806 of yacc.c  */
-#line 257 "parser.y"
+#line 334 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(1,IKS_AST_ARIM_INVERSAO);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
+							gv_declare(IKS_AST_ARIM_INVERSAO,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
 						}
     break;
 
   case 53:
 
 /* Line 1806 of yacc.c  */
-#line 263 "parser.y"
+#line 342 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_LE);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_LOGICO_COMP_LE,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 54:
 
 /* Line 1806 of yacc.c  */
-#line 268 "parser.y"
+#line 350 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_GE);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_LOGICO_COMP_GE,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 55:
 
 /* Line 1806 of yacc.c  */
-#line 273 "parser.y"
+#line 358 "parser.y"
     {
-							//Useless...
+							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_L);
+							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_LOGICO_COMP_L,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 56:
 
 /* Line 1806 of yacc.c  */
-#line 276 "parser.y"
+#line 366 "parser.y"
     {
-							//Useless...
+							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_G);
+							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_LOGICO_COMP_G,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 57:
 
 /* Line 1806 of yacc.c  */
-#line 279 "parser.y"
+#line 374 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_IGUAL);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_LOGICO_COMP_IGUAL,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 58:
 
 /* Line 1806 of yacc.c  */
-#line 284 "parser.y"
+#line 382 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_DIF);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_LOGICO_COMP_DIF,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 59:
 
 /* Line 1806 of yacc.c  */
-#line 289 "parser.y"
+#line 390 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_LOGICO_E);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_LOGICO_E,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 60:
 
 /* Line 1806 of yacc.c  */
-#line 294 "parser.y"
+#line 398 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_LOGICO_OU);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
+							gv_declare(IKS_AST_LOGICO_OU,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(1) - (3)].tree_node));
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 						}
     break;
 
   case 61:
 
 /* Line 1806 of yacc.c  */
-#line 299 "parser.y"
+#line 406 "parser.y"
     {
 							(yyval.tree_node) = arvoreCriaNodo(1,IKS_AST_LOGICO_COMP_NEGACAO);
-							 arvoreInsereNodo((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
+							arvoreInsereNodo((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
+							gv_declare(IKS_AST_LOGICO_COMP_NEGACAO,(const void*)(yyval.tree_node),NULL);
+							gv_connect((yyval.tree_node),(yyvsp[(2) - (2)].tree_node));
 						}
     break;
 
   case 62:
 
 /* Line 1806 of yacc.c  */
-#line 305 "parser.y"
+#line 414 "parser.y"
     {	(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 				}
     break;
@@ -2072,7 +2194,7 @@ yyreduce:
   case 63:
 
 /* Line 1806 of yacc.c  */
-#line 307 "parser.y"
+#line 416 "parser.y"
     {	(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 				}
     break;
@@ -2080,7 +2202,7 @@ yyreduce:
   case 64:
 
 /* Line 1806 of yacc.c  */
-#line 309 "parser.y"
+#line 418 "parser.y"
     {
 					(yyval.tree_node) = (yyvsp[(2) - (3)].tree_node);
 				}
@@ -2089,58 +2211,80 @@ yyreduce:
   case 65:
 
 /* Line 1806 of yacc.c  */
-#line 312 "parser.y"
+#line 421 "parser.y"
     {	(yyval.tree_node) = arvoreCriaNodo(2,IKS_AST_VETOR_INDEXADO);
-							comp_tree_t * id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);//TODO: Fix this...ponteiro para a tabela de simbolos
+							comp_tree_t * id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
+							id->pt_tabela = (yyvsp[(1) - (4)].symbol);
 							arvoreInsereNodo((yyval.tree_node),id);
 							arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (4)].tree_node));
+
+							gv_declare(IKS_AST_VETOR_INDEXADO,(const void*)(yyval.tree_node),NULL);
+							gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+							gv_connect((yyval.tree_node),id);
+							gv_connect((yyval.tree_node),(yyvsp[(3) - (4)].tree_node));
 						}
     break;
 
   case 66:
 
 /* Line 1806 of yacc.c  */
-#line 317 "parser.y"
-    {//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+#line 432 "parser.y"
+    {
+					(yyval.tree_node) = arvoreCriaNodo(0/*pode ter mais!*/,IKS_AST_IDENTIFICADOR);
+					(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (1)].symbol);
+
+					gv_declare(IKS_AST_IDENTIFICADOR,(const void*)(yyval.tree_node),((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave);
 				}
     break;
 
   case 67:
 
 /* Line 1806 of yacc.c  */
-#line 319 "parser.y"
-    {	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+#line 438 "parser.y"
+    {	
+				(yyval.tree_node) = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (1)].symbol);
+				gv_declare(IKS_AST_LITERAL,(const void*)(yyval.tree_node),((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave);
 			}
     break;
 
   case 68:
 
 /* Line 1806 of yacc.c  */
-#line 321 "parser.y"
-    {	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+#line 443 "parser.y"
+    {
+				(yyval.tree_node) = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (1)].symbol);
+				gv_declare(IKS_AST_LITERAL,(const void*)(yyval.tree_node),((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave);
 			}
     break;
 
   case 69:
 
 /* Line 1806 of yacc.c  */
-#line 323 "parser.y"
-    {	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+#line 448 "parser.y"
+    {	
+				(yyval.tree_node) = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (1)].symbol);
+				gv_declare(IKS_AST_LITERAL,(const void*)(yyval.tree_node),((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave);
 			}
     break;
 
   case 70:
 
 /* Line 1806 of yacc.c  */
-#line 325 "parser.y"
-    {	//TODO: ponteiro para a tabela de simbolos
+#line 453 "parser.y"
+    {	
+				(yyval.tree_node) = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (1)].symbol);
+				gv_declare(IKS_AST_LITERAL,(const void*)(yyval.tree_node),((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave);
 			}
     break;
 
   case 71:
 
 /* Line 1806 of yacc.c  */
-#line 327 "parser.y"
+#line 458 "parser.y"
     {	(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 				}
     break;
@@ -2148,23 +2292,41 @@ yyreduce:
   case 72:
 
 /* Line 1806 of yacc.c  */
-#line 329 "parser.y"
-    {//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
-				}
+#line 460 "parser.y"
+    {
+				(yyval.tree_node) = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (1)].symbol);
+				
+				char * str_ptr = ((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave;
+				//printf("HERE 1 %d\n", strlen(str_ptr));
+				char chave[strlen(str_ptr)+3];//Contando-se o '\0'
+				//printf("HERE 2\n");
+				chave[0] = '\\';
+				chave[1] = '\"';
+				strcpy(chave+2,str_ptr+1);
+				int pos = strlen(chave);
+				chave[pos - 1] = '\\';
+				chave[pos] = '\"';
+				chave[pos + 1] = '\0';
+				gv_declare(IKS_AST_LITERAL,(const void*)(yyval.tree_node),chave);
+			}
     break;
 
   case 73:
 
 /* Line 1806 of yacc.c  */
-#line 331 "parser.y"
-    {	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+#line 477 "parser.y"
+    {	
+				(yyval.tree_node) = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				(yyval.tree_node)->pt_tabela = (yyvsp[(1) - (1)].symbol);
+				gv_declare(IKS_AST_LITERAL,(const void*)(yyval.tree_node),((comp_dict_item_t*)(yyval.tree_node)->pt_tabela)->chave);
 			}
     break;
 
   case 74:
 
 /* Line 1806 of yacc.c  */
-#line 335 "parser.y"
+#line 484 "parser.y"
     {
 					(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 				}
@@ -2173,64 +2335,77 @@ yyreduce:
   case 75:
 
 /* Line 1806 of yacc.c  */
-#line 338 "parser.y"
+#line 487 "parser.y"
     {
 								(yyval.tree_node) = (yyvsp[(1) - (3)].tree_node);
 								arvoreInsereNodo((yyvsp[(1) - (3)].tree_node),(yyvsp[(3) - (3)].tree_node));
+								gv_connect((yyval.tree_node),(yyvsp[(3) - (3)].tree_node));
 							}
     break;
 
   case 76:
 
 /* Line 1806 of yacc.c  */
-#line 344 "parser.y"
+#line 494 "parser.y"
     {
 										(yyval.tree_node) = arvoreCriaNodo(4,IKS_AST_IF_ELSE);
 										arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (6)].tree_node));//Condicao
 										arvoreInsereNodo((yyval.tree_node),(yyvsp[(6) - (6)].tree_node));//Comando, se verdade
 										(yyval.tree_node)->filhos[2] = NULL;//Comando, se falso //TODO : REVIEW THIS!!!!
+										gv_declare(IKS_AST_IF_ELSE,(const void*)(yyval.tree_node),NULL);
+										gv_connect((yyval.tree_node),(yyvsp[(3) - (6)].tree_node));
+										gv_connect((yyval.tree_node),(yyvsp[(6) - (6)].tree_node));
 									}
     break;
 
   case 77:
 
 /* Line 1806 of yacc.c  */
-#line 350 "parser.y"
+#line 503 "parser.y"
     { 
 												(yyval.tree_node) = arvoreCriaNodo(4,IKS_AST_IF_ELSE);
 												arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (8)].tree_node));//Condicao
 												arvoreInsereNodo((yyval.tree_node),(yyvsp[(6) - (8)].tree_node));//Comando, se verdade
 												arvoreInsereNodo((yyval.tree_node),(yyvsp[(8) - (8)].tree_node));//Comando, se falso
+												gv_declare(IKS_AST_IF_ELSE,(const void*)(yyval.tree_node),NULL);
+												gv_connect((yyval.tree_node),(yyvsp[(3) - (8)].tree_node));
+												gv_connect((yyval.tree_node),(yyvsp[(6) - (8)].tree_node));
+												gv_connect((yyval.tree_node),(yyvsp[(8) - (8)].tree_node));
 											}
     break;
 
   case 78:
 
 /* Line 1806 of yacc.c  */
-#line 356 "parser.y"
+#line 513 "parser.y"
     {
 												(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_WHILE_DO);
 												arvoreInsereNodo((yyval.tree_node),(yyvsp[(3) - (7)].tree_node));//Condicao
 												arvoreInsereNodo((yyval.tree_node),(yyvsp[(6) - (7)].tree_node));//Comando
+												gv_declare(IKS_AST_WHILE_DO,(const void*)(yyval.tree_node),NULL);
+												gv_connect((yyval.tree_node),(yyvsp[(3) - (7)].tree_node));
+												gv_connect((yyval.tree_node),(yyvsp[(6) - (7)].tree_node));
 											}
     break;
 
   case 79:
 
 /* Line 1806 of yacc.c  */
-#line 361 "parser.y"
+#line 521 "parser.y"
     {
 												(yyval.tree_node) = arvoreCriaNodo(3,IKS_AST_DO_WHILE);
 												arvoreInsereNodo((yyval.tree_node),(yyvsp[(2) - (7)].tree_node));//Comando
 												arvoreInsereNodo((yyval.tree_node),(yyvsp[(5) - (7)].tree_node));//Condicao
-											
+												gv_declare(IKS_AST_DO_WHILE,(const void*)(yyval.tree_node),NULL);
+												gv_connect((yyval.tree_node),(yyvsp[(2) - (7)].tree_node));
+												gv_connect((yyval.tree_node),(yyvsp[(5) - (7)].tree_node));
 											}
     break;
 
   case 80:
 
 /* Line 1806 of yacc.c  */
-#line 369 "parser.y"
+#line 531 "parser.y"
     {
 			(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 		}
@@ -2239,7 +2414,7 @@ yyreduce:
   case 81:
 
 /* Line 1806 of yacc.c  */
-#line 372 "parser.y"
+#line 534 "parser.y"
     {
 			(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 		}
@@ -2248,7 +2423,7 @@ yyreduce:
   case 82:
 
 /* Line 1806 of yacc.c  */
-#line 375 "parser.y"
+#line 537 "parser.y"
     {
 				(yyval.tree_node) = (yyvsp[(1) - (2)].tree_node);
 			}
@@ -2257,7 +2432,7 @@ yyreduce:
   case 83:
 
 /* Line 1806 of yacc.c  */
-#line 378 "parser.y"
+#line 540 "parser.y"
     {
 				(yyval.tree_node) = (yyvsp[(1) - (2)].tree_node);
 			}
@@ -2266,7 +2441,7 @@ yyreduce:
   case 84:
 
 /* Line 1806 of yacc.c  */
-#line 382 "parser.y"
+#line 544 "parser.y"
     {
 					(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 				}
@@ -2275,7 +2450,7 @@ yyreduce:
   case 85:
 
 /* Line 1806 of yacc.c  */
-#line 385 "parser.y"
+#line 547 "parser.y"
     {
 					(yyval.tree_node) = (yyvsp[(1) - (1)].tree_node);
 				}
@@ -2284,7 +2459,7 @@ yyreduce:
 
 
 /* Line 1806 of yacc.c  */
-#line 2288 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
+#line 2463 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c"
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2515,7 +2690,7 @@ yyreturn:
 
 
 /* Line 2067 of yacc.c  */
-#line 389 "parser.y"
+#line 551 "parser.y"
 
 
 int yyerror (char const *mensagem)

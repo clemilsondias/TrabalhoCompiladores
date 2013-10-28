@@ -16,10 +16,11 @@ void yyerror (char const *mensagem)
   fprintf (stderr, "%s\n", mensagem);
 }
 */
+char arquivo_saida[] = "saida.dot";
 
 int main (int argc, char **argv)
 {
-  gv_init(NULL);
+  gv_init(arquivo_saida);
   int resultado = yyparse();
   gv_close();
   return resultado;

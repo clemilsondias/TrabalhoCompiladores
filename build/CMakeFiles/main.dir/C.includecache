@@ -85,6 +85,8 @@ unistd.h
 /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.c
 stdio.h
 -
+string.h
+-
 ../include/main.h
 /home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/../include/main.h
 stddef.h

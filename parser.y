@@ -6,7 +6,7 @@
 
 
 #include <stdio.h>
-//#include "../include/comp_dict.h"
+#include <string.h>
 #include "../include/main.h"
 
 extern int  yylineno;
@@ -58,6 +58,7 @@ extern int  yylineno;
 		  atribuicao lista_elementos chamada_funcao lista_argumentos
 		  fluxo_controle expressao_aritmetica expressao_logica
 		  comando then then_else comandos_while_do
+%type <symbol> cabecalho
 %right '='
 %nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<' '>'
 %left TK_OC_AND TK_OC_OR
@@ -73,8 +74,10 @@ extern int  yylineno;
 s: k TOKEN_EOF { printf("RECONHECEU ENTRADA!\n");
 		 if($1 != NULL){
 			 printf("Valor de retorno: %p, Eh funcao: %d\n",$1, $1->tipo == IKS_AST_FUNCAO);
-			 //comp_tree_t * nodo_programa = arvoreCriaNodo(1/*NUMERO DE FILHOS?? 1??*/,IKS_AST_PROGRAMA);
-		 	 //arvoreInsereNodo(nodo_programa,$1);
+			 comp_tree_t * nodo_programa = arvoreCriaNodo(1,IKS_AST_PROGRAMA);
+			 arvoreInsereNodo(nodo_programa,$1);
+		 	 gv_declare(IKS_AST_PROGRAMA,(const void*)nodo_programa,NULL);
+			 gv_connect(nodo_programa,$1);
 		 }
 		 return IKS_SYNTAX_SUCESSO; };
 
@@ -83,6 +86,7 @@ k: declaracoes k {printf("Tem mais decls...\n");
 		  if($1 != NULL && $2 != NULL){
 			arvoreInsereNodo($1,$2);
 		  	$$ = $1;
+			gv_connect($1,$2);
 		  }
 		  else
 			$$ = $2;
@@ -99,8 +103,7 @@ declaracoes: decl_variavel {printf("BISON -> é variável!\n");
 			 $$ = NULL;
 			}
            | decl_funcao {printf("BISON -> eh funcao!\n");
-			  comp_tree_t * nodo_funcao = arvoreCriaNodo(2/*FILHOS - 2? Comando + proxima funcao?*/,IKS_AST_FUNCAO);/*PASS NODE UP*/
-			  $$ = nodo_funcao; 
+			  $$ = $1;
 			 };
 
 /* tipos de variáveis e vetores */
@@ -121,16 +124,24 @@ decl_parametro: tipo ':' TK_IDENTIFICADOR {printf("BISON -> decl parametro sem s
 /* declaração de funções */
 decl_funcao: cabecalho decl_locais bloco {
 						/*Passar os nodos de comandos por aqui!!*/
-						$$ = $3;//Algo assim...
+						$$ = arvoreCriaNodo(2/*FILHOS - 2? Comando + proxima funcao?*/,IKS_AST_FUNCAO);/*PASS NODE UP*/
+						$$->pt_tabela = $1;
+						arvoreInsereNodo($$,$3);
+						gv_declare(IKS_AST_FUNCAO,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
+						gv_connect($$,$3);
 					 }
 	   | cabecalho bloco {
 				/*Mesma coisa aqui...*/
-				$$ = $2;
+				$$ = arvoreCriaNodo(2,IKS_AST_FUNCAO);
+				$$->pt_tabela = $1;
+				arvoreInsereNodo($$,$2);
+				gv_declare(IKS_AST_FUNCAO,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
+				gv_connect($$,$2);
 			     };
 
 /* cabeçalho de função (linha da declaração) */
-cabecalho: tipo ':' TK_IDENTIFICADOR '(' decl_parametro ')'
-	 | tipo ':' TK_IDENTIFICADOR '(' ')';
+cabecalho: tipo ':' TK_IDENTIFICADOR '(' decl_parametro ')'	{$$ = $3;}
+	 | tipo ':' TK_IDENTIFICADOR '(' ')'			{$$ = $3;};
 
 
 /* regra para declaração de variáveis locais de funções */
@@ -142,19 +153,28 @@ bloco: '{' comandos '}' {
 				comp_tree_t * nodo_bloco = arvoreCriaNodo(2,IKS_AST_BLOCO);//Filhos: comandos dentro do bloco e proximo comando.
 				arvoreInsereNodo(nodo_bloco,$2);//Insere o nodo vindo de comandos. 
 				$$ = nodo_bloco;
+				gv_declare(IKS_AST_BLOCO,(const void*)$$,NULL);
+				gv_connect($$,$2);
 			}
      | '{' '}' {
 			$$ = arvoreCriaNodo(1,IKS_AST_BLOCO);//Somente um filho - o proximo comando, que sera definido um nivel acima.
+			gv_declare(IKS_AST_BLOCO,(const void*)$$,NULL);
 	       };
  
 
 /* regra para sequência de comandos*/
 comandos: comando_simples ';' comandos 	{
-						arvoreInsereNodo($1,$3);
+						if($3 != NULL){
+							arvoreInsereNodo($1,$3);
+							gv_connect($1,$3);
+						}
 						$$ = $1;
 					}
         | fluxo_controle  comandos	{
-						arvoreInsereNodo($1,$2);
+						if($2 != NULL){
+							arvoreInsereNodo($1,$2);
+							gv_connect($1,$2);
+						}
 						$$ = $1;
 					}
 	| comando_simples ';'		{
@@ -164,7 +184,10 @@ comandos: comando_simples ';' comandos 	{
 						$$ = $1;
 					}
         | bloco ';' comandos		{
-						arvoreInsereNodo($1,$3);
+						if($3 != NULL){
+							arvoreInsereNodo($1,$3);
+							gv_connect($1,$3);
+						}
 						$$ = $1;
 					}
 	| bloco				{
@@ -172,7 +195,7 @@ comandos: comando_simples ';' comandos 	{
 					}
         | ';'				{
 						$$ = NULL;				
-	};
+					};
 
 /* regra para comando único em then e else (sem ponto e vírgula) */
 comando: comando_simples {$$ = $1;}
@@ -187,12 +210,35 @@ comando_simples: atribuicao		{$$ = $1;}
 
 /* regra para atribuições */
 atribuicao: TK_IDENTIFICADOR '=' expressao				{	//TODO: ADICIONAR PONTEIROS PARA A TABELA DE SIMBOLOS NOS NODOS!!!
-										$$ = arvoreCriaNodo(3,IKS_AST_IDENTIFICADOR); //AST_IDENTIFICADOR||AST_INDEXADO + EXPRESSAO + prox comando
-									 	
+										$$ = arvoreCriaNodo(3,IKS_AST_ATRIBUICAO);
+										comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR); //AST_IDENTIFICADOR||AST_INDEXADO + EXPRESSAO + prox comando
+										id->pt_tabela = $1;
+										arvoreInsereNodo($$,id);
+										arvoreInsereNodo($$,$3);
+
+										gv_declare(IKS_AST_ATRIBUICAO,(const void*)$$,NULL);
+										gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+										gv_connect($$,id);
+										gv_connect($$,$3);
 									}
           | TK_IDENTIFICADOR '[' expressao ']' '=' expressao		{
-										$$ = arvoreCriaNodo(3,IKS_AST_VETOR_INDEXADO);
-									};
+										$$ = arvoreCriaNodo(3,IKS_AST_ATRIBUICAO);
+										comp_tree_t* idx = arvoreCriaNodo(2,IKS_AST_VETOR_INDEXADO);
+										comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR); //AST_IDENTIFICADOR||AST_INDEXADO + EXPRESSAO + prox comando
+										id->pt_tabela = $1;
+										arvoreInsereNodo($$,idx);
+										arvoreInsereNodo($$,$6);
+										arvoreInsereNodo(idx,id);
+										arvoreInsereNodo(idx,$3);
+
+										gv_declare(IKS_AST_ATRIBUICAO,(const void*)$$,NULL);
+										gv_declare(IKS_AST_VETOR_INDEXADO,(const void*)idx,NULL);
+										gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+										gv_connect($$,idx);
+										gv_connect($$,$6);
+										gv_connect(idx,id);
+										gv_connect(idx,$3);
+								};
 
 /* regra de input */
 entrada: TK_PR_INPUT TK_IDENTIFICADOR 	{
@@ -213,21 +259,40 @@ lista_elementos: expressao 				{
                | expressao ',' lista_elementos		{	//TODO: PODE-SE TER A OPCAO DE TER MAIS FILHOS PARA A EXPRESSAO!! ALOCAR UM APONTADOR AO MENOS!!
 								arvoreInsereNodo($1,$3);
 								$$ = $1;
+								
+								gv_connect($$,$3);
 							};
 
 /* regra de retorno */
 retorno: TK_PR_RETURN expressao	{
 					$$ = arvoreCriaNodo(2,IKS_AST_RETURN);
 					arvoreInsereNodo($$,$2);
+					gv_declare(IKS_AST_RETURN,(const void*)$$,NULL);
+					gv_connect($$,$2);
 				};
 
 /* regra para chamada de função */
 chamada_funcao:   TK_IDENTIFICADOR '(' lista_argumentos ')' 	{ 
 									$$ = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);
+									comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
+									id->pt_tabela = $1;
+									arvoreInsereNodo($$,id);
 									arvoreInsereNodo($$,$3);
+
+									gv_declare(IKS_AST_CHAMADA_DE_FUNCAO,(const void*)$$,NULL);
+									gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+									gv_connect($$,id);
+									gv_connect($$,$3);
 								}
 		| TK_IDENTIFICADOR '(' ')' 	{
-							$$ = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);//TODO: REVIEW
+							$$ = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);
+							comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
+							id->pt_tabela = $1;
+							arvoreInsereNodo($$,id);
+
+							gv_declare(IKS_AST_CHAMADA_DE_FUNCAO,(const void*)$$,NULL);
+							gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+							gv_connect($$,id);
 						};
 
 /* regra para expressão aritmética */
@@ -235,28 +300,42 @@ expressao_aritmetica: expressao '+' expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_SOMA);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_ARIM_SOMA,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						}
                     | expressao '-' expressao	{ 
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_SUBTRACAO);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_ARIM_SUBTRACAO,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 
 						}
                     | expressao '*' expressao	{ 
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_MULTIPLICACAO);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_ARIM_MULTIPLICACAO,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 
 						}
                     | expressao '/' expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_DIVISAO);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_ARIM_DIVISAO,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 
 						}
 		    | '-' expressao 		{
 							$$ = arvoreCriaNodo(1,IKS_AST_ARIM_INVERSAO);
 							arvoreInsereNodo($$,$2);
+							gv_declare(IKS_AST_ARIM_INVERSAO,(const void*)$$,NULL);
+							gv_connect($$,$2);
 						};
 
 /* regra para expressão lógica */
@@ -264,41 +343,71 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_LE);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_LOGICO_COMP_LE,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						}
                 | expressao TK_OC_GE expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_GE);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_LOGICO_COMP_GE,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						}
                 | expressao '<' expressao	{
-							//Useless...
+							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_L);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_LOGICO_COMP_L,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						}
 		| expressao '>' expressao	{
-							//Useless...
+							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_G);
+							arvoreInsereNodo($$,$1);
+							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_LOGICO_COMP_G,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						}
                 | expressao TK_OC_EQ expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_IGUAL);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_LOGICO_COMP_IGUAL,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						} 
                 | expressao TK_OC_NE expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_DIF);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_LOGICO_COMP_DIF,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						}
                 | expressao TK_OC_AND expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_E);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_LOGICO_E,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						}
                 | expressao TK_OC_OR expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_OU);
 							arvoreInsereNodo($$,$1);
 							arvoreInsereNodo($$,$3);
+							gv_declare(IKS_AST_LOGICO_OU,(const void*)$$,NULL);
+							gv_connect($$,$1);
+							gv_connect($$,$3);
 						}
 		| '!' expressao 		{
 							$$ = arvoreCriaNodo(1,IKS_AST_LOGICO_COMP_NEGACAO);
-							 arvoreInsereNodo($$,$2);
+							arvoreInsereNodo($$,$2);
+							gv_declare(IKS_AST_LOGICO_COMP_NEGACAO,(const void*)$$,NULL);
+							gv_connect($$,$2);
 						};
 
 /* regra para expressões em geral */
@@ -310,25 +419,64 @@ expressao: expressao_aritmetica	{	$$ = $1;
 					$$ = $2;
 				}
          | TK_IDENTIFICADOR '[' expressao ']'	{	$$ = arvoreCriaNodo(2,IKS_AST_VETOR_INDEXADO);
-							comp_tree_t * id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);//TODO: Fix this...ponteiro para a tabela de simbolos
+							comp_tree_t * id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
+							id->pt_tabela = $1;
 							arvoreInsereNodo($$,id);
 							arvoreInsereNodo($$,$3);
+
+							gv_declare(IKS_AST_VETOR_INDEXADO,(const void*)$$,NULL);
+							gv_declare(IKS_AST_IDENTIFICADOR,(const void*)id,((comp_dict_item_t*)id->pt_tabela)->chave);
+							gv_connect($$,id);
+							gv_connect($$,$3);
 						}
-         | TK_IDENTIFICADOR	{//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+         | TK_IDENTIFICADOR	{
+					$$ = arvoreCriaNodo(0/*pode ter mais!*/,IKS_AST_IDENTIFICADOR);
+					$$->pt_tabela = $1;
+
+					gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 				}
-         | TK_LIT_INT	{	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+         | TK_LIT_INT	{	
+				$$ = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				$$->pt_tabela = $1;
+				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
-         | TK_LIT_TRUE	{	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+         | TK_LIT_TRUE	{
+				$$ = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				$$->pt_tabela = $1;
+				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
-         | TK_LIT_FALSE	{	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+         | TK_LIT_FALSE	{	
+				$$ = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				$$->pt_tabela = $1;
+				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			} 
-         | TK_LIT_FLOAT	{	//TODO: ponteiro para a tabela de simbolos
+         | TK_LIT_FLOAT	{	
+				$$ = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				$$->pt_tabela = $1;
+				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
          | chamada_funcao	{	$$ = $1;
 				}
-	 | TK_LIT_STRING	{//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
-				}
-	 | TK_LIT_CHAR	{	//TODO: PONTEIRO PARA A TABELA DE SIMBOLOS
+	 | TK_LIT_STRING{
+				$$ = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				$$->pt_tabela = $1;
+
+				//Adaptando a string de saida ao formato desejado...
+				char * str_ptr = ((comp_dict_item_t*)$$->pt_tabela)->chave;
+				char chave[strlen(str_ptr)+3];//Contando-se o '\0' e mais duas barras '\\'
+				chave[0] = '\\';
+				chave[1] = '\"';
+				strcpy(chave+2,str_ptr+1);
+				int pos = strlen(chave);
+				chave[pos - 1] = '\\';
+				chave[pos] = '\"';
+				chave[pos + 1] = '\0';
+				gv_declare(IKS_AST_LITERAL,(const void*)$$,chave);
+			}
+	 | TK_LIT_CHAR	{	
+				$$ = arvoreCriaNodo(0,IKS_AST_LITERAL);
+				$$->pt_tabela = $1;
+				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			};
 
 /* regra para lista de argumentos de chamadas de funções */
@@ -338,6 +486,7 @@ lista_argumentos: expressao 	{
                 | expressao ',' lista_argumentos	{
 								$$ = $1;
 								arvoreInsereNodo($1,$3);
+								gv_connect($$,$3);
 							};
 
 /* regras para fluxos de controle */
@@ -346,23 +495,35 @@ fluxo_controle: TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then_else	{
 										arvoreInsereNodo($$,$3);//Condicao
 										arvoreInsereNodo($$,$6);//Comando, se verdade
 										$$->filhos[2] = NULL;//Comando, se falso //TODO : REVIEW THIS!!!!
+										gv_declare(IKS_AST_IF_ELSE,(const void*)$$,NULL);
+										gv_connect($$,$3);
+										gv_connect($$,$6);
 									}
               | TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then TK_PR_ELSE then_else 	{ 
 												$$ = arvoreCriaNodo(4,IKS_AST_IF_ELSE);
 												arvoreInsereNodo($$,$3);//Condicao
 												arvoreInsereNodo($$,$6);//Comando, se verdade
 												arvoreInsereNodo($$,$8);//Comando, se falso
+												gv_declare(IKS_AST_IF_ELSE,(const void*)$$,NULL);
+												gv_connect($$,$3);
+												gv_connect($$,$6);
+												gv_connect($$,$8);
 											}
               | TK_PR_WHILE '(' expressao_logica ')' TK_PR_DO comandos_while_do ';'	{
 												$$ = arvoreCriaNodo(3,IKS_AST_WHILE_DO);
 												arvoreInsereNodo($$,$3);//Condicao
 												arvoreInsereNodo($$,$6);//Comando
+												gv_declare(IKS_AST_WHILE_DO,(const void*)$$,NULL);
+												gv_connect($$,$3);
+												gv_connect($$,$6);
 											}
               | TK_PR_DO comandos_while_do TK_PR_WHILE '(' expressao_logica ')' ';' 	{
 												$$ = arvoreCriaNodo(3,IKS_AST_DO_WHILE);
 												arvoreInsereNodo($$,$2);//Comando
 												arvoreInsereNodo($$,$5);//Condicao
-											
+												gv_declare(IKS_AST_DO_WHILE,(const void*)$$,NULL);
+												gv_connect($$,$2);
+												gv_connect($$,$5);
 											};
 
 /* regra para blocos de comandos de then e else*/

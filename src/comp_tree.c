@@ -25,12 +25,13 @@ comp_tree_t* arvoreCriaNodo(int qtdeFilhos,int tipo) {
    comp_tree_t *novoNodo;
    int i;
 
-   novoNodo = (comp_tree_t *) malloc(sizeof(comp_tree_t) + sizeof(int) * qtdeFilhos);
+   novoNodo = (comp_tree_t *) malloc(sizeof(comp_tree_t) + sizeof(comp_tree_t*) * (qtdeFilhos <= 0 ? 1 : qtdeFilhos));
 
    novoNodo->qtdeFilhos = qtdeFilhos;
    novoNodo->tipo = tipo;
    for (i = 0; i < qtdeFilhos; i++)
       novoNodo->filhos[i] = NULL;
+   novoNodo->pt_tabela = NULL;
 
    return novoNodo;
 }
