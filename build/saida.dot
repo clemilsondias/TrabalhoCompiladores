@@ -1,79 +1,35 @@
 digraph G {
-node_0x1b58520 [label="2"]
-node_0x1b58540 [label="x"]
-node_0x1b58560 [label="*"]
-node_0x1b58560 -> node_0x1b58520
-node_0x1b58560 -> node_0x1b58540
-node_0x1b58590 [label="return"]
-node_0x1b58590 -> node_0x1b58560
-node_0x1b585c0 [label="block"]
-node_0x1b585c0 -> node_0x1b58590
-node_0x1b585f0 [label="f2"]
-node_0x1b585f0 -> node_0x1b585c0
-node_0x1b58670 [label="v"]
-node_0x1b58690 [label="a"]
-node_0x1b58700 [label="1"]
-node_0x1b58720 [label="-"]
-node_0x1b58720 -> node_0x1b58690
-node_0x1b58720 -> node_0x1b58700
-node_0x1b58750 [label="[]"]
-node_0x1b58750 -> node_0x1b58670
-node_0x1b58750 -> node_0x1b58720
-node_0x1b587d0 [label="4"]
-node_0x1b587f0 [label="1"]
-node_0x1b58810 [label="-"]
-node_0x1b58810 -> node_0x1b587d0
-node_0x1b58810 -> node_0x1b587f0
-node_0x1b58840 [label="!="]
-node_0x1b58840 -> node_0x1b58750
-node_0x1b58840 -> node_0x1b58810
-node_0x1b58870 [label="v"]
-node_0x1b58890 [label="[]"]
-node_0x1b588c0 [label="a"]
-node_0x1b58930 [label="f"]
-node_0x1b58950 [label="2"]
-node_0x1b58970 [label="call"]
-node_0x1b58970 -> node_0x1b58930
-node_0x1b58970 -> node_0x1b58950
-node_0x1b589a0 [label="-"]
-node_0x1b589a0 -> node_0x1b588c0
-node_0x1b589a0 -> node_0x1b58970
-node_0x1b589d0 [label="f"]
-node_0x1b589f0 [label="v"]
-node_0x1b58a10 [label="2"]
-node_0x1b58a30 [label="[]"]
-node_0x1b58a30 -> node_0x1b589f0
-node_0x1b58a30 -> node_0x1b58a10
-node_0x1b58a60 [label="call"]
-node_0x1b58a60 -> node_0x1b589d0
-node_0x1b58a60 -> node_0x1b58a30
-node_0x1b58a90 [label="1"]
-node_0x1b58ab0 [label="-"]
-node_0x1b58ab0 -> node_0x1b58a60
-node_0x1b58ab0 -> node_0x1b58a90
-node_0x1b58ae0 [label="="]
-node_0x1b58ae0 -> node_0x1b58890
-node_0x1b58ae0 -> node_0x1b58ab0
-node_0x1b58890 -> node_0x1b58870
-node_0x1b58890 -> node_0x1b589a0
-node_0x1b58b10 [label="whiledo"]
-node_0x1b58b10 -> node_0x1b58840
-node_0x1b58b10 -> node_0x1b58ae0
-node_0x1b58b40 [label="a"]
-node_0x1b58bb0 [label="3.2"]
-node_0x1b58bd0 [label="-"]
-node_0x1b58bd0 -> node_0x1b58bb0
-node_0x1b58c00 [label="="]
-node_0x1b58c00 -> node_0x1b58b40
-node_0x1b58c00 -> node_0x1b58bd0
-node_0x1b58c30 [label="block"]
-node_0x1b58c00 -> node_0x1b58c30
-node_0x1b58b10 -> node_0x1b58c00
-node_0x1b58c60 [label="block"]
-node_0x1b58c60 -> node_0x1b58b10
-node_0x1b58c90 [label="my_function"]
-node_0x1b58c90 -> node_0x1b58c60
-node_0x1b585f0 -> node_0x1b58c90
-node_0x1b58cc0 [label="programa"]
-node_0x1b58cc0 -> node_0x1b585f0
+node_0xe28390 [label="n"]
+node_0xe28400 [label="0"]
+node_0xe28420 [label="=="]
+node_0xe28420 -> node_0xe28390
+node_0xe28420 -> node_0xe28400
+node_0xe284a0 [label="1"]
+node_0xe284c0 [label="return"]
+node_0xe284c0 -> node_0xe284a0
+node_0xe284f0 [label="n"]
+node_0xe28510 [label="funcao_calc_fatorial"]
+node_0xe28530 [label="n"]
+node_0xe28550 [label="1"]
+node_0xe28570 [label="-"]
+node_0xe28570 -> node_0xe28530
+node_0xe28570 -> node_0xe28550
+node_0xe285a0 [label="call"]
+node_0xe285a0 -> node_0xe28510
+node_0xe285a0 -> node_0xe28570
+node_0xe285d0 [label="*"]
+node_0xe285d0 -> node_0xe284f0
+node_0xe285d0 -> node_0xe285a0
+node_0xe28600 [label="return"]
+node_0xe28600 -> node_0xe285d0
+node_0xe28630 [label="ifelse"]
+node_0xe28630 -> node_0xe28420
+node_0xe28630 -> node_0xe284c0
+node_0xe28630 -> node_0xe28600
+node_0xe28670 [label="block"]
+node_0xe28670 -> node_0xe28630
+node_0xe286a0 [label="funcao_calc_fatorial"]
+node_0xe286a0 -> node_0xe28670
+node_0xe286d0 [label="programa"]
+node_0xe286d0 -> node_0xe286a0
 }
