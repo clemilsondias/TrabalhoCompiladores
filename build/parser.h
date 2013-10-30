@@ -86,9 +86,15 @@ typedef union YYSTYPE
  comp_tree_t * tree_node;
 
 
+/* Line 2068 of yacc.c  */
+#line 27 "parser.y"
+
+ int type_data;
+
+
 
 /* Line 2068 of yacc.c  */
-#line 92 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h"
+#line 98 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

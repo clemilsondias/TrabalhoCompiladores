@@ -32,4 +32,84 @@
 #define IKS_SIMBOLO_BOOL            5
 #define IKS_SIMBOLO_IDENTIFICADOR   6
 
+
+
+/*********
+ ETAPA - 4
+**********/
+/*
+ * Códigos de tipos - Etapa 4.
+ */
+
+#define IKS_INT		1
+#define IKS_FLOAT	2
+#define IKS_CHAR	3
+#define IKS_STRING	4
+#define IKS_BOOL	5
+
+/*
+ * Definição do tipo de dado (variável simples ou vetor).
+ */
+#define IKS_TYPE_VARIABLE	1
+#define IKS_TYPE_VECTOR		2
+
+/*
+ * Tamanhos dos tipos de dados primitivos (em bytes).
+ */
+
+#define IKS_SIZE_CHAR			1
+#define IKS_SIZE_BOOL			1
+#define IKS_SIZE_INT			4	
+#define IKS_SIZE_FLOAT			8
+
+/*
+ * Macro que define os tamanho de strings.
+ */
+#define IKS_SIZE_STRING(L)		L*IKS_SIZE_CHAR
+
+/*
+ * Macros que definem os tamanhos de vetores.
+ */
+//Vetor de strings, caso entre no escopo do trabalho.
+#ifdef __STRING_VECTOR_ENABLED
+	#define IKS_SIZE_VECTOR_STRING(S,L)	S*IKS_SIZE_STRING(L)
+#endif
+
+#define IKS_SIZE_VECTOR_CHAR(L)		L*IKS_SIZE_CHAR
+#define IKS_SIZE_VECTOR_BOOL(L)		L*IKS_SIZE_BOOL
+#define IKS_SIZE_VECTOR_INT(L)		L*IKS_SIZE_INT
+#define IKS_SIZE_VECTOR_FLOAT(L)	L*IKS_SIZE_FLOAT
+
+
+/*
+ * Códigos de retorno para erros semânticos - Etapa 4.
+ */
+
+#define IKS_SUCCESS			 0	//caso não houver nenhum tipo de erro
+
+/*1 - Verificação de declarações */
+#define IKS_ERROR_UNDECLARED		 1	//identificador não declarado
+#define IKS_ERROR_DECLARED		 2	//identificador já declarado
+
+/*2 - Uso correto de identificadores */
+#define IKS_ERROR_VARIABLE		 3	//identificador deve ser utilizado como variável
+#define IKS_ERROR_VECTOR		 4	//identificador deve ser utilizado como vetor
+#define IKS_ERROR_FUNCTION		 5	//identificador deve ser utilizado como função
+
+/*3 - Tipos e tamanho de dados */
+#define IKS_ERROR_WRONG_TYPE		 6	//tipos incompatíveis
+#define IKS_ERROR_STRING_TO_X		 7	//coerção impossível do tipo string
+#define IKS_ERROR_CHAR_TO_X		 8	//coerção impossível do tipo char
+
+/*4 - Argumentos e parâmetros */
+#define IKS_ERROR_MISSING_ARGS		 9	//faltam argumentos
+#define IKS_ERROR_EXCESS_ARGS		10	//sobram argumentos
+#define IKS_ERROR_WRONG_TYPE_ARGS	11	//argumentos incompatíveis
+
+/*5 - Verificação de tipos em comandos */
+#define IKS_ERROR_WRONG_PAR_INPUT	12	//parâmetro não é identificador
+#define IKS_ERROR_WRONG_PAR_OUTPUT	13	//parâmetro não é literal string ou expressão
+#define IKS_ERROR_WRONG_PAR_RETURN	14	//parâmetro não é expressão compatível com tipo do retorno
+
+
 #endif

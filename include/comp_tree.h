@@ -6,7 +6,8 @@
 //estuturas de dados temporárias 
 typedef struct comp_tree_t {
    int qtdeFilhos;
-   int tipo;
+   int tipo;		//Tipo de nodo.
+   int tipo_dado;	//Tipo de dado associado ao nodo.
    struct comp_dict_t * pt_tabela;
    struct comp_tree_t *filhos[];
 } comp_tree_t;

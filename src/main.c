@@ -1,7 +1,6 @@
 /* COMPONENTES:
 	Clemilson Dias
-	Arthur Foscarini
-	Rafael Galuschka
+	Rafael da Fonte Lopes da Silva
 */
 /*
    main.c
@@ -10,12 +9,6 @@
 */
 #include "main.h"
 
-/*
-void yyerror (char const *mensagem)
-{
-  fprintf (stderr, "%s\n", mensagem);
-}
-*/
 char arquivo_saida[] = "saida.dot";
 
 int main (int argc, char **argv)

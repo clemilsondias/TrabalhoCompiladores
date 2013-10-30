@@ -5,7 +5,7 @@
 */
 
 
-#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "../include/main.h"
 
@@ -21,6 +21,11 @@ extern int  yylineno;
 %union
 {
  comp_tree_t * tree_node;
+};
+
+%union
+{
+ int type_data;
 };
 
  
@@ -61,6 +66,7 @@ extern int  yylineno;
 		  variavel_atr_simples variavel_atr_index_id variavel_atr_index_arvore
 		  expressao_indexada_id chamada_funcao_id
 %type <symbol> cabecalho
+%type <type_data> tipo
 %right '='
 %nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<' '>'
 %left TK_OC_AND TK_OC_OR
@@ -73,7 +79,7 @@ extern int  yylineno;
 
 
 /* regra inicial da gramática */
-s: k TOKEN_EOF { printf("RECONHECEU ENTRADA!\n");
+s: k TOKEN_EOF {
 		 if($1 != NULL){//Se tiver funcoes...
 			 comp_tree_t * nodo_programa = arvoreCriaNodo(1,IKS_AST_PROGRAMA);
 			 arvoreInsereNodo(nodo_programa,$1);
@@ -82,50 +88,48 @@ s: k TOKEN_EOF { printf("RECONHECEU ENTRADA!\n");
 		 }
 		 return IKS_SYNTAX_SUCESSO; };
 
-k: declaracoes k {printf("Tem mais decls...\n");
-		  /*ADD NODE TO THE PARENT NODE, PASS PARENT NODE UP*/
-		  if($1 != NULL && $2 != NULL){
-			arvoreInsereNodo($1,$2);
-		  	$$ = $1;
-			gv_connect($1,$2);
-		  }
-		  else
-			$$ = $2;
-   		 }
-   |declaracoes {printf("Eh a ultima decl...\n");
-		 /*PASS NODE UP (Won't be NULL if it is a function node)*/
-		 $$ = $1;};
+k: declaracoes k 	{
+		 		if($1 != NULL && $2 != NULL){
+					arvoreInsereNodo($1,$2);
+			  		$$ = $1;
+					gv_connect($1,$2);
+			  	}
+		  		else
+					$$ = $2;
+   		 	}
+   |declaracoes		{$$ = $1;};
 
 /* regra de declaracoes */
-declaracoes: decl_variavel {printf("BISON -> é variável!\n");
-			    $$ = NULL;
-			   } 
-           | decl_vetor {printf("BISON -> eh vetor!\n");
-			 $$ = NULL;
-			}
-           | decl_funcao {printf("BISON -> eh funcao!\n");
-			  $$ = $1;
-			 };
+declaracoes: decl_variavel	{$$ = NULL;} 
+           | decl_vetor		{$$ = NULL;}
+	   | decl_funcao	{$$ =   $1;};
 
 /* tipos de variáveis e vetores */
-tipo: TK_PR_INT
-    | TK_PR_FLOAT
-    | TK_PR_BOOL
-    | TK_PR_CHAR
-    | TK_PR_STRING;
+tipo: TK_PR_INT		{$$ = IKS_INT;}
+    | TK_PR_FLOAT	{$$ = IKS_FLOAT;}
+    | TK_PR_BOOL	{$$ = IKS_BOOL;}
+    | TK_PR_CHAR	{$$ = IKS_CHAR;}
+    | TK_PR_STRING	{$$ = IKS_BOOL;};
 
 /* declarações de variáveis e vetores */
-decl_variavel: tipo ':' TK_IDENTIFICADOR ';' {printf("BISON -> decl variavel: %s\n",$3->chave);};
-decl_vetor: tipo ':' TK_IDENTIFICADOR '[' TK_LIT_INT ']' ';' {printf("BISON -> decl vetor: %s\n",$3->chave);};
+decl_variavel: tipo ':' TK_IDENTIFICADOR ';'			{
+									$3->tipo_dado = $1;
+									$3->tipo_estrutura = IKS_TYPE_VARIABLE; //É uma variável simples...
+									$3->tamanho = sm_size_from_type_var($1);
+								};
+decl_vetor: tipo ':' TK_IDENTIFICADOR '[' TK_LIT_INT ']' ';'	{
+									$3->tipo_dado = $1;
+									$3->tipo_estrutura = IKS_TYPE_VECTOR;//É um vetor...
+									$3->tamanho = sm_size_from_type_var($1,atoi($5->chave)); 
+								};
 
 /* declaracao de parametro de função */
-decl_parametro: tipo ':' TK_IDENTIFICADOR {printf("BISON -> decl parametro sem separador: %s\n",$3->chave);/*MAKE NODE, PASS UP*/}
-              | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {printf("BISON -> decl parametro com separador: %s\n",$3->chave);/*MAKE NODE, ADD CHILDREN NODES*/};
+decl_parametro: tipo ':' TK_IDENTIFICADOR {}
+              | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {};
 
 /* declaração de funções */
 decl_funcao: cabecalho decl_locais bloco {
-						/*Passar os nodos de comandos por aqui!!*/
-						$$ = arvoreCriaNodo(2/*FILHOS - 2? Comando + proxima funcao?*/,IKS_AST_FUNCAO);/*PASS NODE UP*/
+						$$ = arvoreCriaNodo(2,IKS_AST_FUNCAO);/*PASS NODE UP*/
 						$$->pt_tabela = $1;
 						arvoreInsereNodo($$,$3);
 						gv_declare(IKS_AST_FUNCAO,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
@@ -359,6 +363,8 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_declare(IKS_AST_ARIM_SOMA,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
 						}
                     | expressao '-' expressao	{ 
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_SUBTRACAO);
@@ -367,6 +373,8 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_declare(IKS_AST_ARIM_SUBTRACAO,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
 
 						}
                     | expressao '*' expressao	{ 
@@ -377,6 +385,7 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado); 
 						}
                     | expressao '/' expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_DIVISAO);
@@ -386,12 +395,16 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+
 						}
 		    | '-' expressao 		{
 							$$ = arvoreCriaNodo(2,IKS_AST_ARIM_INVERSAO);
 							arvoreInsereNodo($$,$2);
 							gv_declare(IKS_AST_ARIM_INVERSAO,(const void*)$$,NULL);
 							gv_connect($$,$2);
+
+							$$->tipo_dado = $2->tipo_dado;
 						};
 
 /* regra para expressão lógica */
@@ -402,6 +415,8 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_declare(IKS_AST_LOGICO_COMP_LE,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+				
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
 						}
                 | expressao TK_OC_GE expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_GE);
@@ -410,6 +425,8 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_declare(IKS_AST_LOGICO_COMP_GE,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
 						}
                 | expressao '<' expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_L);
@@ -418,6 +435,8 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_declare(IKS_AST_LOGICO_COMP_L,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
 						}
 		| expressao '>' expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_G);
@@ -426,6 +445,8 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_declare(IKS_AST_LOGICO_COMP_G,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
 						}
                 | expressao TK_OC_EQ expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_IGUAL);
@@ -434,6 +455,8 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_declare(IKS_AST_LOGICO_COMP_IGUAL,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
 						} 
                 | expressao TK_OC_NE expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_DIF);
@@ -442,6 +465,8 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_declare(IKS_AST_LOGICO_COMP_DIF,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
 						}
                 | expressao TK_OC_AND expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_E);
@@ -450,6 +475,8 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_declare(IKS_AST_LOGICO_E,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
 						}
                 | expressao TK_OC_OR expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_OU);
@@ -458,21 +485,28 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_declare(IKS_AST_LOGICO_OU,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$3);
+
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
 						}
 		| '!' expressao 		{
 							$$ = arvoreCriaNodo(2,IKS_AST_LOGICO_COMP_NEGACAO);
 							arvoreInsereNodo($$,$2);
 							gv_declare(IKS_AST_LOGICO_COMP_NEGACAO,(const void*)$$,NULL);
 							gv_connect($$,$2);
+
+							$$->tipo_dado = $2->tipo_dado;
 						};
 
 /* regra para expressões em geral */
 expressao: expressao_aritmetica	{	$$ = $1;
+					$$->tipo_dado = $1->tipo_dado;
 				}
          | expressao_logica	{	$$ = $1;
+					$$->tipo_dado = $1->tipo_dado;
 				}
          | '(' expressao ')'	{
 					$$ = $2;
+					$$->tipo_dado = $2->tipo_dado;
 				}
          | expressao_indexada_id '[' expressao ']'	{
 								$$ = arvoreCriaNodo(3,IKS_AST_VETOR_INDEXADO);
@@ -482,6 +516,7 @@ expressao: expressao_aritmetica	{	$$ = $1;
 								gv_declare(IKS_AST_VETOR_INDEXADO,(const void*)$$,NULL);
 								gv_connect($$,$1);
 								gv_connect($$,$3);
+								$$->tipo_dado = $1->tipo_dado;
 							}
          | TK_IDENTIFICADOR	{
 					$$ = arvoreCriaNodo(1/*pode ter mais!*/,IKS_AST_IDENTIFICADOR);
@@ -537,6 +572,7 @@ expressao_indexada_id: 	TK_IDENTIFICADOR	{
 							$$ = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
 							$$->pt_tabela = $1;
 							gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
+							$$->tipo_dado = $1->tipo_dado;//Olha a partir do tipo da tabela de simbolos.
 						};
 
 /* regra para lista de argumentos de chamadas de funções */
@@ -613,4 +649,50 @@ int yyerror (char const *mensagem)
 {
   fprintf (stderr, "ERRO %s na linha: %d\n",mensagem,yylineno);
   return IKS_SYNTAX_ERRO;
+}
+
+int sm_size_from_type_var(int type){
+	switch(type){
+		case IKS_INT:		{return IKS_SIZE_INT;}
+		case IKS_FLOAT:		{return	IKS_SIZE_FLOAT;}
+		case IKS_CHAR:		{return IKS_SIZE_CHAR;}
+		case IKS_BOOL:		{return IKS_SIZE_BOOL;}
+		case IKS_STRING:	{return 0;}//TODO: CUIDAR COM AS STRINGS!
+		default:{
+			fprintf(stderr, "ERRO : tipo informado inexistente...\n");
+			exit(200);//TODO: o que fazer neste caso??
+		} 
+	};
+}
+int sm_size_from_type_vec(int type,int length){
+	switch(type){
+		case IKS_INT:		{return IKS_SIZE_VECTOR_INT(length);}
+		case IKS_FLOAT:		{return	IKS_SIZE_VECTOR_FLOAT(length);}
+		case IKS_CHAR:		{return IKS_SIZE_VECTOR_CHAR(length);}
+		case IKS_BOOL:		{return IKS_SIZE_VECTOR_BOOL(length);}
+		case IKS_STRING:	{return 0;}//TODO: CUIDAR COM AS STRINGS!
+		default:{
+			fprintf(stderr, "ERRO : tipo informado inexistente...\n");
+			exit(200);//TODO: o que fazer neste caso??
+		} 
+	};
+}
+
+int sm_infer_type_from_expr(int tau_one, int tau_two){
+
+	switch(tau_one){
+		case IKS_STRING:{if(tau_two == IKS_STRING) return IKS_STRING; else exit(IKS_ERROR_STRING_TO_X);}
+		case IKS_CHAR:	{if(tau_two == IKS_CHAR)   return IKS_CHAR;   else exit(IKS_ERROR_CHAR_TO_X);  }
+		default:{
+			if(tau_two == IKS_STRING)
+				exit(IKS_ERROR_STRING_TO_X);
+			if(tau_two == IKS_CHAR)
+				exit(IKS_ERROR_CHAR_TO_X);
+			if(tau_two == IKS_FLOAT)
+				return IKS_FLOAT;
+			if(tau_two == IKS_INT)
+				return IKS_INT;
+			return IKS_BOOL;
+		}
+	};
 }

@@ -9,6 +9,10 @@ typedef struct {
    int tipo;
    int simbolo;
    int lineNumber;
+   //ETAPA 4
+   int tipo_dado;	//Tipo do dado.
+   int tipo_estrutura;	//Tipo de estrutura: vetor ou variavel
+   int tamanho;		//Tamanho total do dado.
    struct comp_dict_item_t *prox;
 } comp_dict_item_t;
 
