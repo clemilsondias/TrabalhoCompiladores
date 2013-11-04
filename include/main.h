@@ -40,6 +40,9 @@
 /*
  * Códigos de tipos - Etapa 4.
  */
+/*
+ * Definicao de codigos para os tipos de dados. No caso de funcoes, eh utilizado para determinar o valor de retorno.
+ */
 
 #define IKS_INT		1
 #define IKS_FLOAT	2
@@ -48,11 +51,11 @@
 #define IKS_BOOL	5
 
 /*
- * Definição do tipo de dado (variável simples ou vetor).
+ * Definição do tipo do identificador (variável simples, vetor ou funcao).
  */
 #define IKS_TYPE_VARIABLE	1
 #define IKS_TYPE_VECTOR		2
-
+#define IKS_TYPE_FUNCTION	3
 /*
  * Tamanhos dos tipos de dados primitivos (em bytes).
  */
@@ -111,5 +114,10 @@
 #define IKS_ERROR_WRONG_PAR_OUTPUT	13	//parâmetro não é literal string ou expressão
 #define IKS_ERROR_WRONG_PAR_RETURN	14	//parâmetro não é expressão compatível com tipo do retorno
 
+#define IKS_FATAL_ERROR			666
 
+extern int yylileno;
+extern comp_dict_t *dicionario_atual;
+extern int escopo_eh_local;
+extern int passou_declaracoes_funcao;
 #endif

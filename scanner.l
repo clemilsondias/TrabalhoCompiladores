@@ -8,12 +8,14 @@
 #include "main.h"
 #include "parser.h"
 
-comp_dict_t *dicionario;
+//comp_dict_t *dicionario;
+//comp_dict_t *dicionario_escopo_local;
+//comp_dict_t *dicionario_atual;
+
 comp_dict_item_t *itemDic;
 
-
 int getLineNumber(void);
-int LineNumber = 1;
+void initDicionario(void);
 
 
 %}
@@ -35,28 +37,28 @@ LIT_STRING 	\"(\\.|[^\\"])*\"
 
 <comentario>[^*\n]*        /* consome qualquer coisa que não seja '*' */
 <comentario>"*"+[^*/\n]*   /* consome todos os '*' que não são seguidos de '/' */
-<comentario>\n             ++LineNumber;++yylineno;
+<comentario>\n             ++yylineno;
 <comentario>"*"+"/"        BEGIN(INITIAL);
 
 "//"         BEGIN(comentario1);
 
 <comentario1>[^\n]*        /* consome qualquer coisa que não seja '/' */
-<comentario1>\n             ++LineNumber;++yylineno;BEGIN(INITIAL);
+<comentario1>\n            ++yylineno;BEGIN(INITIAL);
 
 [ \t\r]		/* espaços */
 
-int 		{ /* printf("reservada int\n"); */ return TK_PR_INT; }
-float 		{ /* printf("reservada float\n"); */ return TK_PR_FLOAT; }
+int 		{ return TK_PR_INT; }
+float 		{ return TK_PR_FLOAT; }
 bool 		{ return TK_PR_BOOL; }
-char 		{ /* printf("reservada char\n");*/ return TK_PR_CHAR; }
-string 		{ /* printf("reservada string\n"); */ return TK_PR_STRING; }
-if 		{ /* printf("IF\n"); */ return TK_PR_IF; }
-then 		{ /* printf("then \n");*/ return TK_PR_THEN; }
-else 		{ /* printf("else \n"); */ return TK_PR_ELSE; }
-while 		{ /* printf("while \n"); */ return TK_PR_WHILE; }
+char 		{ return TK_PR_CHAR; }
+string 		{ return TK_PR_STRING; }
+if 		{ return TK_PR_IF; }
+then 		{ return TK_PR_THEN; }
+else 		{ return TK_PR_ELSE; }
+while 		{ return TK_PR_WHILE; }
 do 		{ return TK_PR_DO; }
 input 		{ return TK_PR_INPUT; }
-output 		{ /* printf("output\n"); */ return TK_PR_OUTPUT; }
+output 		{ return TK_PR_OUTPUT; }
 return 		{ return TK_PR_RETURN; }
 
 [,:\(\)+*/<>!&$] { return yytext[0]; }
@@ -74,139 +76,164 @@ return 		{ return TK_PR_RETURN; }
 "!=" 		{ return TK_OC_NE; }
 "&&" 		{ return TK_OC_AND; }
 "||" 		{ return TK_OC_OR; }
-"\n"		{++LineNumber;++yylineno;}
+"\n"		{ ++yylineno; }
 
-{LIT_STRING} 	{
-			printf("string. o texto é:%s\n",yytext);					
-			if (!dicionarioExiste(dicionario))
+{LIT_STRING} 	{					
+			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
-                        if(dicionarioProcuraChave(dicionario,yytext) == 0)
+                        if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
 			{
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_STRING,IKS_SIMBOLO_STRING);
 				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
+				dicionarioInsereItem(dicionario_atual,itemDic);
 				return TK_LIT_STRING;
 			} else 
 			{
-				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
+				yylval.symbol = dicionarioRetornaChave(dicionario_atual,yytext);
+				dicionarioAtualizaLinha(dicionario_atual,yytext,yylineno);
 				return TK_LIT_STRING; 
 			}
 		}
 
 
-{LIT_INT} 	{ 
-			printf("literal int. o texto é:%s\n",yytext);
-			if (!dicionarioExiste(dicionario))
+{LIT_INT} 	{
+			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
-			if(dicionarioProcuraChave(dicionario,yytext) == 0)
+			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
 			{
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_INT,IKS_SIMBOLO_INT);
 				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
+				dicionarioInsereItem(dicionario_atual,itemDic);
 				return TK_LIT_INT;
 			} else 
 			{
-				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
+				yylval.symbol = dicionarioRetornaChave(dicionario_atual,yytext);
+				dicionarioAtualizaLinha(dicionario_atual,yytext,yylineno);
 				return TK_LIT_INT; 
 			}
 		}
 			
 {LIT_FLOAT} 	{
-			printf("lit float. o texto é:%s\n",yytext);				
-			if (!dicionarioExiste(dicionario))
+			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
-			if(dicionarioProcuraChave(dicionario,yytext) == 0)
+			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
 			{
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_FLOAT,IKS_SIMBOLO_FLOAT);
 				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
+				dicionarioInsereItem(dicionario_atual,itemDic);
 				return TK_LIT_FLOAT;
 			} else 
 			{
-				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
+				yylval.symbol = dicionarioRetornaChave(dicionario_atual,yytext);
+				dicionarioAtualizaLinha(dicionario_atual,yytext,yylineno);
 				return TK_LIT_FLOAT; 
 			}
 		}
 			
-{LIT_FALSE} 	{ 
-			printf("lit false. o texto é:%s\n",yytext);				
-			if (!dicionarioExiste(dicionario))
+{LIT_FALSE} 	{
+			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
-			if(dicionarioProcuraChave(dicionario,yytext) == 0)
+			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
 			{
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_FALSE,IKS_SIMBOLO_BOOL);
 				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
+				dicionarioInsereItem(dicionario_atual,itemDic);
 				return TK_LIT_FALSE;
 			} else 
 			{
-				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
+				yylval.symbol = dicionarioRetornaChave(dicionario_atual,yytext);
+				dicionarioAtualizaLinha(dicionario_atual,yytext,yylineno);				
 				return TK_LIT_FALSE; 
 			}
 		}
 			
-{LIT_TRUE} 	{ 
-			printf("lit true. o texto é:%s\n",yytext);				
-			if (!dicionarioExiste(dicionario))
+{LIT_TRUE} 	{
+			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
-			if(dicionarioProcuraChave(dicionario,yytext) == 0)
+			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
 			{
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_TRUE,IKS_SIMBOLO_BOOL);
 				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
+				dicionarioInsereItem(dicionario_atual,itemDic);
 				return TK_LIT_TRUE;
 			} else 
 			{
-				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
+				yylval.symbol = dicionarioRetornaChave(dicionario_atual,yytext);
+				dicionarioAtualizaLinha(dicionario_atual,yytext,yylineno);				
 				return TK_LIT_TRUE; 
 			}
 		}
 			
-{LIT_CHAR} 	{ 
-			printf("lit char. o texto é:%s\n",yytext);				
-			if (!dicionarioExiste(dicionario))
+{LIT_CHAR} 	{
+			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
-			if(dicionarioProcuraChave(dicionario,yytext) == 0)
+			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
 			{
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_CHAR,IKS_SIMBOLO_CHAR);
 				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
+				dicionarioInsereItem(dicionario_atual,itemDic);
 				return TK_LIT_CHAR;
 			} else 
 			{
-				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);				
+				yylval.symbol = dicionarioRetornaChave(dicionario_atual,yytext);
+				dicionarioAtualizaLinha(dicionario_atual,yytext,yylineno);				
 				return TK_LIT_CHAR; 
 			}
 		}
 			
 {ID} 		{
-			printf("ID. o texto é:%s\n",yytext);
-			if (!dicionarioExiste(dicionario))
+			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
-			if(dicionarioProcuraChave(dicionario,yytext) == 0)
+			switch(escopo_eh_local){
+				case true:{
+					if(!passou_declaracoes_funcao){//Declaracao variavel local/parametro
+						if(procura_dic(dicionario_atual,yytext) == 0)//Procura item no dicionario local, nao deve achar...
+						{
+							add_item_dicionario(dicionario_atual);
+						} else {
+							exit(IKS_ERROR_DECLARED);//Encontrou algo, eh uma redeclaracao.
+						}
+					} else{//Esta no escopo da funcao, mas ja passou pelas declaracoes de parametros/variaveis locais
+						//TODO: procura no dicionario local. Se nao estiver la, procura no global. Se nao estiver la, ERRO!
+						if(procura_dic(dicionario_atual,yytext) != 0)//Esta no local
+						{
+							referenciar_dicionario(dicionario_atual);
+						} else {
+							if(procura_dic(dic_global) != 0)//Esta no global //TODO: extern no dicionario de escopo global!
+								referenciar_dicionario(/*TODO: DEFINE THIS GUY!*/dic_global/*TODO: DEFINE THIS GUY!!!*/);
+							else
+								exit(IKS_ERROR_UNDECLARED);//Variavel referenciada nao foi declarada...
+						}
+					}
+					break;
+				}
+				case false:{//Referencia no escopo global -> dicionario_atual eh o global
+					if(procura_dic(dicionario_atual,yytext) == 0)//Caso bom, nao eh uma redeclaracao...
+						add_item_dicionario(dicionario_atual);//dicionario_atual eh o global, gracas ao parser
+					else//Caso ruim, achou algo
+						exit(IKS_ERROR_DECLARED);//Esta havendo uma redeclaracao, eh um erro!					
+					break;
+				}
+				default:{//Caso inalcancavel...
+					fprintf(stderr,"Erro impossivel, como?\n");
+					exit(IKS_FATAL_ERROR);
+				}
+			};
+			return TK_IDENTIFICADOR;
+/*//Matido para lembrar como era...
+			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
 			{
-//				printf("Criado item no dicionario:%s\n",yytext);
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_IDENTIFICADOR,IKS_SIMBOLO_IDENTIFICADOR);
 				yylval.symbol = itemDic;
-				dicionarioInsereItem(dicionario,itemDic);
-				
-				//printf("----------\n\n");
-				//dicionarioImprime(dicionario);
-				//printf("\n\n----------\n\n");
-				
+				dicionarioInsereItem(dicionario_atual,itemDic);	
 				return TK_IDENTIFICADOR;
 			} else 
-			{
-				yylval.symbol = dicionarioRetornaChave(dicionario,yytext);
-				dicionarioAtualizaLinha(dicionario,yytext,yylineno);
+			{	
+				yylval.symbol = dicionarioRetornaChave(dicionario_atual,yytext);
+				dicionarioAtualizaLinha(dicionario_atual,yytext,yylineno);
                                 return TK_IDENTIFICADOR;
 			}
+*/
 		}
 
 <<EOF>>		{return TOKEN_EOF;}
@@ -223,5 +250,20 @@ int getLineNumber(void)
 void initDicionario(void)
 {
    int token = 0;
-   dicionario = dicionarioCria(token);
+   dicionario_atual = dicionarioCria(token);
+}
+
+inline int procura_dic(comp_dict_t* dic, char * chave){
+	return 	dicionarioProcuraChave(dic,chave);
+}
+
+inline void add_item_dicionario(comp_dict_t* dic){
+	itemDic = dicionarioCriaItem(yytext,yylineno,TK_IDENTIFICADOR,IKS_SIMBOLO_IDENTIFICADOR);
+	yylval.symbol = itemDic;
+	dicionarioInsereItem(dic,itemDic);
+}
+
+inline void referenciar_dicionario(comp_dict_t* dic){
+	yylval.symbol = dicionarioRetornaChave(dic,yytext);
+	dicionarioAtualizaLinha(dic,yytext,yylineno);
 }

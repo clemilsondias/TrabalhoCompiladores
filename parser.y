@@ -9,7 +9,17 @@
 #include <string.h>
 #include "../include/main.h"
 
-extern int  yylineno;
+int yylineno;
+int escopo_eh_local;
+int passou_declaracoes_funcao;
+comp_dict_t *dicionario_escopo_global;
+comp_dict_t *dicionario_escopo_local;
+comp_dict_t *dicionario_atual;
+inline void sm_verify_if_variable(comp_dict_item_t* variable);
+inline void sm_verify_if_vector(comp_dict_item_t* vector);
+inline void sm_verify_if_function(comp_dict_item_t* item);
+inline void inicializa_dic_escopo_global();
+inline void inicializa_dic_escopo_local();
 
 %}
 
@@ -29,7 +39,7 @@ extern int  yylineno;
 };
 
  
-/* Declaração dos tokens da gramática da Linguagem K */
+/* Declaração dos tokens da gramática da Linguagem IKS */
 %token TK_PR_INT
 %token TK_PR_FLOAT
 %token TK_PR_BOOL
@@ -79,23 +89,24 @@ extern int  yylineno;
 
 
 /* regra inicial da gramática */
-s: k TOKEN_EOF {
-		 if($1 != NULL){//Se tiver funcoes...
+s: {inicializa_dic_escopo_global();}
+	k TOKEN_EOF {
+		 if($2 != NULL){//Se tiver funcoes...
 			 comp_tree_t * nodo_programa = arvoreCriaNodo(1,IKS_AST_PROGRAMA);
-			 arvoreInsereNodo(nodo_programa,$1);
+			 arvoreInsereNodo(nodo_programa,$2);
 		 	 gv_declare(IKS_AST_PROGRAMA,(const void*)nodo_programa,NULL);
-			 gv_connect(nodo_programa,$1);
+			 gv_connect(nodo_programa,$2);
 		 }
 		 return IKS_SYNTAX_SUCESSO; };
 
-k: declaracoes k 	{
-		 		if($1 != NULL && $2 != NULL){
-					arvoreInsereNodo($1,$2);
-			  		$$ = $1;
-					gv_connect($1,$2);
+k: declaracoes {inicializa_dic_escopo_global();} k 	{
+		 		if($1 != NULL && $3 != NULL){
+					arvoreInsereNodo($1,$3);
+			  		$$ = $3;
+					gv_connect($1,$3);
 			  	}
 		  		else
-					$$ = $2;
+					$$ = $3;
    		 	}
    |declaracoes		{$$ = $1;};
 
@@ -128,25 +139,25 @@ decl_parametro: tipo ':' TK_IDENTIFICADOR {}
               | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {};
 
 /* declaração de funções */
-decl_funcao: cabecalho decl_locais bloco {
+decl_funcao: cabecalho decl_locais {passou_declaracoes_funcao = 1;} bloco {
 						$$ = arvoreCriaNodo(2,IKS_AST_FUNCAO);/*PASS NODE UP*/
-						$$->pt_tabela = $1;
-						arvoreInsereNodo($$,$3);
+						$$->pt_tabela = (void*)$1;
+						arvoreInsereNodo($$,$4);
 						gv_declare(IKS_AST_FUNCAO,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
-						gv_connect($$,$3);
+						gv_connect($$,$4);
 					 }
-	   | cabecalho bloco {
+	   | cabecalho {passou_declaracoes_funcao = 1;} bloco {
 				/*Mesma coisa aqui...*/
 				$$ = arvoreCriaNodo(2,IKS_AST_FUNCAO);
-				$$->pt_tabela = $1;
-				arvoreInsereNodo($$,$2);
+				$$->pt_tabela = (void*)$1;
+				arvoreInsereNodo($$,$3);
 				gv_declare(IKS_AST_FUNCAO,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
-				gv_connect($$,$2);
+				gv_connect($$,$3);
 			     };
 
 /* cabeçalho de função (linha da declaração) */
-cabecalho: tipo ':' TK_IDENTIFICADOR '(' decl_parametro ')'	{$$ = $3;}
-	 | tipo ':' TK_IDENTIFICADOR '(' ')'			{$$ = $3;};
+cabecalho: tipo ':' TK_IDENTIFICADOR {inicializa_dic_escopo_local();}'(' decl_parametro ')'	{$$ = $3;}
+	 | tipo ':' TK_IDENTIFICADOR {inicializa_dic_escopo_local();}'(' ')'			{$$ = $3;};
 
 
 /* regra para declaração de variáveis locais de funções */
@@ -260,6 +271,10 @@ atribuicao:	variavel_atr_simples expressao	{
 							gv_declare(IKS_AST_ATRIBUICAO,(const void*)$$,NULL);
 							gv_connect($$,$1);
 							gv_connect($$,$2);
+							
+							//Acoes semanticas...
+							int has_to_convert = sm_atr_verify_coercion_possible($1->tipo_dado,$2->tipo_dado);//Determinar se deve ocorrer coercao.
+							//TODO: usar este valor aqui, e depois para caso de vetor indexado tambem.	
 						}
 
 		|variavel_atr_index_id variavel_atr_index_arvore expressao ']' '=' expressao	{
@@ -274,18 +289,26 @@ atribuicao:	variavel_atr_simples expressao	{
 													gv_connect($$,$6);
 													gv_connect($2,$1);
 													gv_connect($2,$3);
+													
+													int has_to_convert = sm_atr_verify_coercion_possible($1->tipo_dado,$6->tipo_dado);
 								};
 
 
 variavel_atr_simples:	TK_IDENTIFICADOR '='	{
+							//Verificando que eh variavel...
+							(void)sm_verify_if_variable($1);
 							$$ = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
-							$$->pt_tabela = $1;
+							$$->pt_tabela = (void*)$1;
+							$$->tipo_dado = $1->tipo_dado;
 							gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 						};
 
-variavel_atr_index_id: TK_IDENTIFICADOR	{
+variavel_atr_index_id: TK_IDENTIFICADOR		{
+							//Verificando que eh vetor...
+							(void)sm_verify_if_vector($1);
 							$$ = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
-							$$->pt_tabela = $1;
+							$$->pt_tabela = (void*)$1;
+							$$->tipo_dado = $1->tipo_dado;
 							gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 						};
 variavel_atr_index_arvore: '['	{
@@ -297,7 +320,7 @@ variavel_atr_index_arvore: '['	{
 entrada: TK_PR_INPUT TK_IDENTIFICADOR 	{
 						$$ = arvoreCriaNodo(2,IKS_AST_INPUT);
 						comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
-						id->pt_tabela = $2;
+						id->pt_tabela = (void*)$2;
 						arvoreInsereNodo($$,id);
 						gv_declare(IKS_AST_INPUT,(const void*)$$,NULL);
 						gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)id->pt_tabela)->chave);
@@ -317,7 +340,7 @@ saida: TK_PR_OUTPUT lista_elementos	{
 lista_elementos: expressao 				{
 								$$ = $1;
 							}
-               | expressao ',' lista_elementos		{	//TODO: PODE-SE TER A OPCAO DE TER MAIS FILHOS PARA A EXPRESSAO!! ALOCAR UM APONTADOR AO MENOS!!
+               | expressao ',' lista_elementos		{
 								arvoreInsereNodo($1,$3);
 								$$ = $1;
 								
@@ -351,7 +374,7 @@ chamada_funcao:   chamada_funcao_id '(' lista_argumentos ')' 	{
 						};
 chamada_funcao_id: TK_IDENTIFICADOR	{
 						$$ = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
-						$$->pt_tabela = $1;
+						$$->pt_tabela = (void*)$1;
 						gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 					};
 
@@ -520,35 +543,35 @@ expressao: expressao_aritmetica	{	$$ = $1;
 							}
          | TK_IDENTIFICADOR	{
 					$$ = arvoreCriaNodo(1/*pode ter mais!*/,IKS_AST_IDENTIFICADOR);
-					$$->pt_tabela = $1;
+					$$->pt_tabela = (void*)$1;
 
 					gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 				}
          | TK_LIT_INT	{	
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
-				$$->pt_tabela = $1;
+				$$->pt_tabela = (void*)$1;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
          | TK_LIT_TRUE	{
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
-				$$->pt_tabela = $1;
+				$$->pt_tabela = (void*)$1;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
          | TK_LIT_FALSE	{	
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
-				$$->pt_tabela = $1;
+				$$->pt_tabela = (void*)$1;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			} 
          | TK_LIT_FLOAT	{	
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
-				$$->pt_tabela = $1;
+				$$->pt_tabela = (void*)$1;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
          | chamada_funcao	{	$$ = $1;
 				}
 	 | TK_LIT_STRING{
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
-				$$->pt_tabela = $1;
+				$$->pt_tabela = (void*)$1;
 
 				//Adaptando a string de saida ao formato desejado...
 				char * str_ptr = ((comp_dict_item_t*)$$->pt_tabela)->chave;
@@ -564,13 +587,13 @@ expressao: expressao_aritmetica	{	$$ = $1;
 			}
 	 | TK_LIT_CHAR	{	
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
-				$$->pt_tabela = $1;
+				$$->pt_tabela = (void*)$1;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			};
 
 expressao_indexada_id: 	TK_IDENTIFICADOR	{
 							$$ = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
-							$$->pt_tabela = $1;
+							$$->pt_tabela = (void*)$1;
 							gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 							$$->tipo_dado = $1->tipo_dado;//Olha a partir do tipo da tabela de simbolos.
 						};
@@ -696,3 +719,62 @@ int sm_infer_type_from_expr(int tau_one, int tau_two){
 		}
 	};
 }
+
+/*
+ *	Funcao que determina a possibilidade de coercao de valores em atribuicoes.
+ */
+int sm_atr_verify_coercion_possible(int type_var,int type_value){
+	switch(type_var){
+		case IKS_STRING:{if(type_value == IKS_STRING) return IKS_STRING; else exit(IKS_ERROR_STRING_TO_X);}//TODO: ou seria IKS_ERROR_WRONG_TYPE??
+		case IKS_CHAR:  {if(type_value == IKS_CHAR)   return IKS_CHAR;   else exit(IKS_ERROR_CHAR_TO_X);  }
+		default:{
+			if(type_value == IKS_STRING)
+				exit(IKS_ERROR_STRING_TO_X);
+			if(type_value == IKS_CHAR)
+				exit(IKS_ERROR_CHAR_TO_X);
+			return type_var; //Fazer a coercao para qualquer tipo que seja, ja que qualquer uma eh possivel.
+		}
+	};
+
+}
+
+
+inline void sm_verify_if_variable(comp_dict_item_t* item){
+	if(item->tipo_estrutura != IKS_TYPE_VARIABLE){
+		if(item->tipo_estrutura == IKS_TYPE_VECTOR)
+			exit(IKS_ERROR_VECTOR);//Caso em que se esta utilizando como variavel um identificador de um dado do tipo vetor.
+		exit(IKS_ERROR_FUNCTION);
+	}
+}
+
+inline void sm_verify_if_vector(comp_dict_item_t* item){
+	if(item->tipo_estrutura != IKS_TYPE_VECTOR){
+		if(item->tipo_estrutura == IKS_TYPE_VARIABLE)
+			exit(IKS_ERROR_VECTOR);
+		exit(IKS_ERROR_FUNCTION);
+	}
+}
+
+inline void sm_verify_if_function(comp_dict_item_t* item){
+	if(item->tipo_estrutura != IKS_TYPE_FUNCTION){
+		if(item->tipo_estrutura == IKS_TYPE_VARIABLE)
+			exit(IKS_ERROR_VARIABLE);
+		exit(IKS_ERROR_VECTOR);
+	}
+}
+
+inline void inicializa_dic_escopo_global(){
+	dicionario_atual = dicionario_escopo_global;
+	escopo_eh_local = 1;
+	passou_declaracoes_funcao = 0;
+}
+
+inline void inicializa_dic_escopo_local(){
+	escopo_eh_local = 0;
+	passou_declaracoes_funcao = 0;
+	dicionario_escopo_global = dicionario_atual;
+	dicionarioRemove(dicionario_escopo_local);
+	dicionario_atual = dicionario_escopo_local;
+}
+
+

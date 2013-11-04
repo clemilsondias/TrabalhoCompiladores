@@ -1,35 +1,13 @@
 digraph G {
-node_0xe28390 [label="n"]
-node_0xe28400 [label="0"]
-node_0xe28420 [label="=="]
-node_0xe28420 -> node_0xe28390
-node_0xe28420 -> node_0xe28400
-node_0xe284a0 [label="1"]
-node_0xe284c0 [label="return"]
-node_0xe284c0 -> node_0xe284a0
-node_0xe284f0 [label="n"]
-node_0xe28510 [label="funcao_calc_fatorial"]
-node_0xe28530 [label="n"]
-node_0xe28550 [label="1"]
-node_0xe28570 [label="-"]
-node_0xe28570 -> node_0xe28530
-node_0xe28570 -> node_0xe28550
-node_0xe285a0 [label="call"]
-node_0xe285a0 -> node_0xe28510
-node_0xe285a0 -> node_0xe28570
-node_0xe285d0 [label="*"]
-node_0xe285d0 -> node_0xe284f0
-node_0xe285d0 -> node_0xe285a0
-node_0xe28600 [label="return"]
-node_0xe28600 -> node_0xe285d0
-node_0xe28630 [label="ifelse"]
-node_0xe28630 -> node_0xe28420
-node_0xe28630 -> node_0xe284c0
-node_0xe28630 -> node_0xe28600
-node_0xe28670 [label="block"]
-node_0xe28670 -> node_0xe28630
-node_0xe286a0 [label="funcao_calc_fatorial"]
-node_0xe286a0 -> node_0xe28670
-node_0xe286d0 [label="programa"]
-node_0xe286d0 -> node_0xe286a0
+node_0x10fc4d0 [label="x"]
+node_0x10fc550 [label="4"]
+node_0x10fc5d0 [label="1"]
+node_0x10fc600 [label="-"]
+node_0x10fc600 -> node_0x10fc550
+node_0x10fc600 -> node_0x10fc5d0
+node_0x10fc640 [label="call"]
+node_0x10fc640 -> node_0x10fc4d0
+node_0x10fc640 -> node_0x10fc600
+node_0x10fc680 [label="output"]
+node_0x10fc680 -> node_0x10fc640
 }
