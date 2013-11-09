@@ -58,6 +58,8 @@ comp_dict_item_t* dicionarioCriaItem(char *chave,int numLinha,int intTipo,int in
    novoItem->tipo = intTipo;
    novoItem->simbolo = intSimbolo;
    novoItem->prox = NULL;
+   novoItem->lista_args_funcao = NULL;
+   novoItem->tamanho = 0;
 
    return novoItem;
 }
@@ -175,19 +177,26 @@ void dicionarioRemoveTodasChaves(comp_dict_t *Dicionario) {
 }
 
 //função que remove um dicionário (e seus itens primeiro)
-void dicionarioRemove(comp_dict_t *Dicionario) {
-   comp_dict_item_t *aux = Dicionario->Itens;
+void dicionarioRemove(comp_dict_t **Dicionario) {
+   if(*Dicionario == NULL)
+	return;
+   comp_dict_item_t *aux = (*Dicionario)->Itens;
 
    //removo os itens do dicionário
-   dicionarioRemoveTodasChaves(Dicionario);
+   dicionarioRemoveTodasChaves(*Dicionario);
    //removo o dicionário
-   free(Dicionario);
+   free(*Dicionario);
+   *Dicionario = NULL;
    return;
 }
 
 //função que imprime os dados de um dicionário
 void dicionarioImprime(comp_dict_t *Dicionario) {
-   comp_dict_item_t *aux = Dicionario->Itens;
+    if(Dicionario == NULL){
+        printf("Dicionario vazio!\n");
+        return;
+    }
+    comp_dict_item_t *aux = Dicionario->Itens;
 
    //info do dicionário
    printf("Dicionario de info %d\n",Dicionario->info);

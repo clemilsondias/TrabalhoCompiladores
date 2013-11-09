@@ -114,10 +114,12 @@
 #define IKS_ERROR_WRONG_PAR_OUTPUT	13	//parâmetro não é literal string ou expressão
 #define IKS_ERROR_WRONG_PAR_RETURN	14	//parâmetro não é expressão compatível com tipo do retorno
 
-#define IKS_FATAL_ERROR			666
+#define IKS_FATAL_ERROR			666	//154, ja que a saida eh um inteiro de 1 byte.
 
 extern int yylileno;
 extern comp_dict_t *dicionario_atual;
+extern comp_dict_t *dicionario_escopo_global;
 extern int escopo_eh_local;
 extern int passou_declaracoes_funcao;
+extern int com_eh_input;//Pela forma como construiu-se o parser, devemos realizar esta verificacao no scanner.
 #endif

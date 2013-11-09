@@ -34,6 +34,28 @@ int listaQtdeNodos(comp_list_t *Lista) {
    return cont;
 }
 
+//função que retorna nodo de uma lista indexado por um argumento
+comp_list_t* listaRetornaNodoIdx(comp_list_t *Lista,int idx) {
+   int cont = 0;
+   comp_list_t *aux = Lista;
+
+   //verifico se a lista está vazia
+   if (listaVazia(aux) == 1 || idx < 0)
+      return NULL;
+   //percorro o restante da lista
+   while (aux->prox != NULL && idx != cont)
+   {
+      //incremento o contador
+      cont = cont + 1;
+      //avanço na lista
+      aux = aux->prox;
+   }
+   if(idx == cont && aux != NULL)
+	return aux;
+   //nao achou o termo...
+   return NULL;
+}
+
 //função que inicializa uma lista - retorna um ponteiro NULL
 comp_list_t* listaCria() {
    comp_list_t *p;
@@ -56,13 +78,13 @@ comp_list_t* listaCriaNodo(int info) {
 }
 
 //função que insere um nodo no final da lista.
-void listaInsereNodo(comp_list_t *Lista, comp_list_t *novoNodo) {
-   comp_list_t *aux = Lista;
+void listaInsereNodo(comp_list_t **Lista, comp_list_t *novoNodo) {
+   comp_list_t *aux = *Lista;
 
    //verifico se a lista está vazia
    if (listaVazia(aux) == 1)
    {
-      Lista = novoNodo;
+      *Lista = novoNodo;
       return;
    } 
    //percorro a lista

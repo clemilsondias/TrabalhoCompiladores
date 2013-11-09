@@ -8,15 +8,14 @@
 #include "main.h"
 #include "parser.h"
 
-//comp_dict_t *dicionario;
-//comp_dict_t *dicionario_escopo_local;
-//comp_dict_t *dicionario_atual;
-
 comp_dict_item_t *itemDic;
 
 int getLineNumber(void);
 void initDicionario(void);
-
+inline int procura_dic(comp_dict_t* dic, char * chave);
+inline void add_item_dicionario(comp_dict_t* dic);
+inline void referenciar_dicionario(comp_dict_t* dic);
+inline void testa_erro_input();
 
 %}
 
@@ -78,7 +77,8 @@ return 		{ return TK_PR_RETURN; }
 "||" 		{ return TK_OC_OR; }
 "\n"		{ ++yylineno; }
 
-{LIT_STRING} 	{					
+{LIT_STRING} 	{	
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
                         if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -86,6 +86,7 @@ return 		{ return TK_PR_RETURN; }
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_STRING,IKS_SIMBOLO_STRING);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_STRING;
 				return TK_LIT_STRING;
 			} else 
 			{
@@ -97,6 +98,7 @@ return 		{ return TK_PR_RETURN; }
 
 
 {LIT_INT} 	{
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -104,6 +106,7 @@ return 		{ return TK_PR_RETURN; }
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_INT,IKS_SIMBOLO_INT);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_INT;
 				return TK_LIT_INT;
 			} else 
 			{
@@ -114,6 +117,7 @@ return 		{ return TK_PR_RETURN; }
 		}
 			
 {LIT_FLOAT} 	{
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -121,6 +125,7 @@ return 		{ return TK_PR_RETURN; }
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_FLOAT,IKS_SIMBOLO_FLOAT);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_FLOAT;
 				return TK_LIT_FLOAT;
 			} else 
 			{
@@ -131,6 +136,7 @@ return 		{ return TK_PR_RETURN; }
 		}
 			
 {LIT_FALSE} 	{
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -138,6 +144,7 @@ return 		{ return TK_PR_RETURN; }
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_FALSE,IKS_SIMBOLO_BOOL);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_BOOL;
 				return TK_LIT_FALSE;
 			} else 
 			{
@@ -148,6 +155,7 @@ return 		{ return TK_PR_RETURN; }
 		}
 			
 {LIT_TRUE} 	{
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -155,6 +163,7 @@ return 		{ return TK_PR_RETURN; }
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_TRUE,IKS_SIMBOLO_BOOL);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_BOOL;
 				return TK_LIT_TRUE;
 			} else 
 			{
@@ -165,6 +174,7 @@ return 		{ return TK_PR_RETURN; }
 		}
 			
 {LIT_CHAR} 	{
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -172,6 +182,7 @@ return 		{ return TK_PR_RETURN; }
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_CHAR,IKS_SIMBOLO_CHAR);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_CHAR;
 				return TK_LIT_CHAR;
 			} else 
 			{
@@ -182,10 +193,12 @@ return 		{ return TK_PR_RETURN; }
 		}
 			
 {ID} 		{
+			//if(com_eh_input) //Nao precisaria desse 'if'
+				com_eh_input = 0;
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			switch(escopo_eh_local){
-				case true:{
+				case 1:{
 					if(!passou_declaracoes_funcao){//Declaracao variavel local/parametro
 						if(procura_dic(dicionario_atual,yytext) == 0)//Procura item no dicionario local, nao deve achar...
 						{
@@ -199,18 +212,23 @@ return 		{ return TK_PR_RETURN; }
 						{
 							referenciar_dicionario(dicionario_atual);
 						} else {
-							if(procura_dic(dic_global) != 0)//Esta no global //TODO: extern no dicionario de escopo global!
-								referenciar_dicionario(/*TODO: DEFINE THIS GUY!*/dic_global/*TODO: DEFINE THIS GUY!!!*/);
-							else
+							if(procura_dic(dicionario_escopo_global,yytext) != 0)//Esta no global
+								referenciar_dicionario(dicionario_escopo_global);
+							else{
 								exit(IKS_ERROR_UNDECLARED);//Variavel referenciada nao foi declarada...
+                            }
 						}
 					}
 					break;
 				}
-				case false:{//Referencia no escopo global -> dicionario_atual eh o global
-					if(procura_dic(dicionario_atual,yytext) == 0)//Caso bom, nao eh uma redeclaracao...
+				case 0:{//Referencia no escopo global -> dicionario_atual eh o global
+                    if(procura_dic(dicionario_atual,yytext) == 0){//Caso bom, nao eh uma redeclaracao...
 						add_item_dicionario(dicionario_atual);//dicionario_atual eh o global, gracas ao parser
-					else//Caso ruim, achou algo
+                        dicionario_escopo_global = dicionario_atual;
+                        //printf("Adicionou %s, %p.\n", yytext,dicionario_atual);
+                        //dicionarioImprime(dicionario_atual);
+                    }
+					else//Caso ruim, achou algo, redeclaracao.
 						exit(IKS_ERROR_DECLARED);//Esta havendo uma redeclaracao, eh um erro!					
 					break;
 				}
@@ -246,7 +264,6 @@ int getLineNumber(void)
 	return yylineno;
 }
 
-//void initDicionario(void);
 void initDicionario(void)
 {
    int token = 0;
@@ -266,4 +283,9 @@ inline void add_item_dicionario(comp_dict_t* dic){
 inline void referenciar_dicionario(comp_dict_t* dic){
 	yylval.symbol = dicionarioRetornaChave(dic,yytext);
 	dicionarioAtualizaLinha(dic,yytext,yylineno);
+}
+
+inline void testa_erro_input(){
+	if(com_eh_input == 1)
+		exit(IKS_ERROR_WRONG_PAR_INPUT);
 }

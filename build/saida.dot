@@ -1,13 +1,4 @@
 digraph G {
-node_0x10fc4d0 [label="x"]
-node_0x10fc550 [label="4"]
-node_0x10fc5d0 [label="1"]
-node_0x10fc600 [label="-"]
-node_0x10fc600 -> node_0x10fc550
-node_0x10fc600 -> node_0x10fc5d0
-node_0x10fc640 [label="call"]
-node_0x10fc640 -> node_0x10fc4d0
-node_0x10fc640 -> node_0x10fc600
-node_0x10fc680 [label="output"]
-node_0x10fc680 -> node_0x10fc640
-}
+node_0x137c3d0 [label="block"]
+node_0x137c400 [label="f"]
+node_0x137c400 -> node_0x137c3d0

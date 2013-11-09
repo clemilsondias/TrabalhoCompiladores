@@ -12,14 +12,26 @@
 int yylineno;
 int escopo_eh_local;
 int passou_declaracoes_funcao;
+int com_eh_input;
+int contador_args_chamada_funcao;
+int contador_regressivo_args_chamada_funcao;
 comp_dict_t *dicionario_escopo_global;
 comp_dict_t *dicionario_escopo_local;
 comp_dict_t *dicionario_atual;
+comp_dict_item_t * pt_tabela_funcao;//Guarda um ponteiro para a entrada na tabela de simbolos da funcao que esta sendo reconhecida
+comp_dict_item_t * pt_tabela_fun_chamada;
 inline void sm_verify_if_variable(comp_dict_item_t* variable);
 inline void sm_verify_if_vector(comp_dict_item_t* vector);
 inline void sm_verify_if_function(comp_dict_item_t* item);
 inline void inicializa_dic_escopo_global();
 inline void inicializa_dic_escopo_local();
+inline void sm_testa_tipos_output(comp_dict_item_t* item);
+inline comp_dict_item_t* sm_define_tipo_funcao(int tipo_funcao, comp_dict_item_t* pt_tabela);
+inline int sm_ret_verify_return_type(int fun_ret_type,int return_var_type);
+inline void sm_insere_lista_args(int tipo,comp_dict_item_t* pt_id);
+inline void sm_testa_qnt_args_missing(comp_dict_item_t* fun);
+inline void sm_testa_qnt_args_excess_and_type(comp_dict_item_t* fun,comp_tree_t* expr);
+inline int sm_fun_call_type_verify_coercion(int fun_arg_type,int expr_type);
 
 %}
 
@@ -75,8 +87,8 @@ inline void inicializa_dic_escopo_local();
 		  comando then then_else comandos_while_do
 		  variavel_atr_simples variavel_atr_index_id variavel_atr_index_arvore
 		  expressao_indexada_id chamada_funcao_id
-%type <symbol> cabecalho
-%type <type_data> tipo
+%type <symbol> cabecalho id_funcao
+%type <type_data> tipo decl_parametro
 %right '='
 %nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<' '>'
 %left TK_OC_AND TK_OC_OR
@@ -120,7 +132,7 @@ tipo: TK_PR_INT		{$$ = IKS_INT;}
     | TK_PR_FLOAT	{$$ = IKS_FLOAT;}
     | TK_PR_BOOL	{$$ = IKS_BOOL;}
     | TK_PR_CHAR	{$$ = IKS_CHAR;}
-    | TK_PR_STRING	{$$ = IKS_BOOL;};
+    | TK_PR_STRING	{$$ = IKS_STRING;};
 
 /* declarações de variáveis e vetores */
 decl_variavel: tipo ':' TK_IDENTIFICADOR ';'			{
@@ -131,22 +143,22 @@ decl_variavel: tipo ':' TK_IDENTIFICADOR ';'			{
 decl_vetor: tipo ':' TK_IDENTIFICADOR '[' TK_LIT_INT ']' ';'	{
 									$3->tipo_dado = $1;
 									$3->tipo_estrutura = IKS_TYPE_VECTOR;//É um vetor...
-									$3->tamanho = sm_size_from_type_var($1,atoi($5->chave)); 
+									$3->tamanho = sm_size_from_type_vec($1,atoi($5->chave)); 
 								};
 
 /* declaracao de parametro de função */
-decl_parametro: tipo ':' TK_IDENTIFICADOR {}
-              | tipo ':' TK_IDENTIFICADOR ',' decl_parametro {};
+decl_parametro: tipo ':' TK_IDENTIFICADOR {sm_insere_lista_args($1,$3);$3->tamanho = sm_size_from_type_var($1);}
+              | tipo ':' TK_IDENTIFICADOR ',' {sm_insere_lista_args($1,$3);$3->tamanho = sm_size_from_type_var($1);} decl_parametro;
 
 /* declaração de funções */
-decl_funcao: cabecalho decl_locais {passou_declaracoes_funcao = 1;} bloco {
+decl_funcao: cabecalho decl_locais passou_decl_action bloco {
 						$$ = arvoreCriaNodo(2,IKS_AST_FUNCAO);/*PASS NODE UP*/
 						$$->pt_tabela = (void*)$1;
 						arvoreInsereNodo($$,$4);
 						gv_declare(IKS_AST_FUNCAO,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 						gv_connect($$,$4);
 					 }
-	   | cabecalho {passou_declaracoes_funcao = 1;} bloco {
+	   | cabecalho passou_decl_action bloco {
 				/*Mesma coisa aqui...*/
 				$$ = arvoreCriaNodo(2,IKS_AST_FUNCAO);
 				$$->pt_tabela = (void*)$1;
@@ -155,9 +167,15 @@ decl_funcao: cabecalho decl_locais {passou_declaracoes_funcao = 1;} bloco {
 				gv_connect($$,$3);
 			     };
 
+passou_decl_action: {passou_declaracoes_funcao = 1;};
+
 /* cabeçalho de função (linha da declaração) */
-cabecalho: tipo ':' TK_IDENTIFICADOR {inicializa_dic_escopo_local();}'(' decl_parametro ')'	{$$ = $3;}
-	 | tipo ':' TK_IDENTIFICADOR {inicializa_dic_escopo_local();}'(' ')'			{$$ = $3;};
+cabecalho: tipo ':' id_funcao init_escopo_local_action '(' decl_parametro ')'	{$$ = sm_define_tipo_funcao($1,$3);}
+	 | tipo ':' id_funcao init_escopo_local_action '(' ')'			{$$ = sm_define_tipo_funcao($1,$3);};
+
+id_funcao: TK_IDENTIFICADOR {pt_tabela_funcao = $1; $$ = $1;};
+
+init_escopo_local_action:{inicializa_dic_escopo_local();};
 
 
 /* regra para declaração de variáveis locais de funções */
@@ -289,7 +307,7 @@ atribuicao:	variavel_atr_simples expressao	{
 													gv_connect($$,$6);
 													gv_connect($2,$1);
 													gv_connect($2,$3);
-													
+													sm_atr_verify_coercion_possible(IKS_INT,$3->tipo_dado);//TODO: coercao possivel nesse caso?
 													int has_to_convert = sm_atr_verify_coercion_possible($1->tipo_dado,$6->tipo_dado);
 								};
 
@@ -317,10 +335,10 @@ variavel_atr_index_arvore: '['	{
 				};
 
 /* regra de input */
-entrada: TK_PR_INPUT TK_IDENTIFICADOR 	{
+entrada: TK_PR_INPUT {com_eh_input = 1;} TK_IDENTIFICADOR 	{
 						$$ = arvoreCriaNodo(2,IKS_AST_INPUT);
 						comp_tree_t* id = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
-						id->pt_tabela = (void*)$2;
+						id->pt_tabela = (void*)$3;
 						arvoreInsereNodo($$,id);
 						gv_declare(IKS_AST_INPUT,(const void*)$$,NULL);
 						gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)id->pt_tabela)->chave);
@@ -338,9 +356,11 @@ saida: TK_PR_OUTPUT lista_elementos	{
 
 /* lista de elementos de output */
 lista_elementos: expressao 				{
+								sm_testa_tipos_output((comp_dict_item_t*)($1->pt_tabela));
 								$$ = $1;
 							}
                | expressao ',' lista_elementos		{
+								sm_testa_tipos_output((comp_dict_item_t*)($1->pt_tabela));
 								arvoreInsereNodo($1,$3);
 								$$ = $1;
 								
@@ -349,6 +369,7 @@ lista_elementos: expressao 				{
 
 /* regra de retorno */
 retorno: TK_PR_RETURN expressao	{
+					int ret_coerc = sm_ret_verify_return_type(pt_tabela_funcao->tipo_dado,$2->tipo_dado);
 					$$ = arvoreCriaNodo(2,IKS_AST_RETURN);
 					arvoreInsereNodo($$,$2);
 					gv_declare(IKS_AST_RETURN,(const void*)$$,NULL);
@@ -356,26 +377,32 @@ retorno: TK_PR_RETURN expressao	{
 				};
 
 /* regra para chamada de função */
-chamada_funcao:   chamada_funcao_id '(' lista_argumentos ')' 	{ 
+chamada_funcao:   chamada_funcao_id '(' lista_argumentos ')' 	{ 	sm_testa_qnt_args_missing((comp_dict_item_t*)($1->pt_tabela));
 									$$ = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);
 									arvoreInsereNodo($$,$1);
 									arvoreInsereNodo($$,$3);
-
+									$$->tipo_dado = $1->tipo_dado;
 									gv_declare(IKS_AST_CHAMADA_DE_FUNCAO,(const void*)$$,NULL);
 									gv_connect($$,$1);
 									gv_connect($$,$3);
 								}
 		| chamada_funcao_id '(' ')' 	{
+							sm_testa_qnt_args_missing((comp_dict_item_t*)($1->pt_tabela));
 							$$ = arvoreCriaNodo(3,IKS_AST_CHAMADA_DE_FUNCAO);
 							arvoreInsereNodo($$,$1);
-
+							$$->tipo_dado = $1->tipo_dado;
 							gv_declare(IKS_AST_CHAMADA_DE_FUNCAO,(const void*)$$,NULL);
 							gv_connect($$,$1);
 						};
 chamada_funcao_id: TK_IDENTIFICADOR	{
 						$$ = arvoreCriaNodo(0,IKS_AST_IDENTIFICADOR);
 						$$->pt_tabela = (void*)$1;
+						$$->tipo_dado = $1->tipo_dado;
 						gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
+
+						//Etapa 4
+						contador_args_chamada_funcao = 0;//Conta quantos argumentos estao sendo chamados na
+						pt_tabela_fun_chamada = $1;
 					};
 
 /* regra para expressão aritmética */
@@ -544,34 +571,40 @@ expressao: expressao_aritmetica	{	$$ = $1;
          | TK_IDENTIFICADOR	{
 					$$ = arvoreCriaNodo(1/*pode ter mais!*/,IKS_AST_IDENTIFICADOR);
 					$$->pt_tabela = (void*)$1;
-
+					$$->tipo_dado = $1->tipo_dado;
 					gv_declare(IKS_AST_IDENTIFICADOR,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 				}
          | TK_LIT_INT	{	
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
 				$$->pt_tabela = (void*)$1;
+				$$->tipo_dado = IKS_INT;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
          | TK_LIT_TRUE	{
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
 				$$->pt_tabela = (void*)$1;
+				$$->tipo_dado = IKS_BOOL;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
          | TK_LIT_FALSE	{	
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
 				$$->pt_tabela = (void*)$1;
+				$$->tipo_dado = IKS_BOOL;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			} 
          | TK_LIT_FLOAT	{	
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
 				$$->pt_tabela = (void*)$1;
+				$$->tipo_dado = IKS_FLOAT;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			}
          | chamada_funcao	{	$$ = $1;
+					$$->tipo_dado = $1->tipo_dado;
 				}
 	 | TK_LIT_STRING{
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
 				$$->pt_tabela = (void*)$1;
+				$$->tipo_dado = IKS_STRING;
 
 				//Adaptando a string de saida ao formato desejado...
 				char * str_ptr = ((comp_dict_item_t*)$$->pt_tabela)->chave;
@@ -588,6 +621,7 @@ expressao: expressao_aritmetica	{	$$ = $1;
 	 | TK_LIT_CHAR	{	
 				$$ = arvoreCriaNodo(1,IKS_AST_LITERAL);
 				$$->pt_tabela = (void*)$1;
+				$$->tipo_dado = IKS_CHAR;
 				gv_declare(IKS_AST_LITERAL,(const void*)$$,((comp_dict_item_t*)$$->pt_tabela)->chave);
 			};
 
@@ -599,14 +633,18 @@ expressao_indexada_id: 	TK_IDENTIFICADOR	{
 						};
 
 /* regra para lista de argumentos de chamadas de funções */
-lista_argumentos: expressao 	{
+lista_argumentos: expressao 	{//Ultima expressao reconhecida, agora "subiremos" na arvore de derivacao testando cada tipo de argumento com as acoes da proxima regra.
 					$$ = $1;
+					contador_args_chamada_funcao++;
+					contador_regressivo_args_chamada_funcao = contador_args_chamada_funcao;
+					sm_testa_qnt_args_excess_and_type(pt_tabela_fun_chamada,$1);
 				}
-                | expressao ',' lista_argumentos	{
-								$$ = $1;
-								arvoreInsereNodo($1,$3);
-								gv_connect($$,$3);
-							};
+                | expressao ',' {contador_args_chamada_funcao++;} lista_argumentos	{
+												$$ = $1;
+												arvoreInsereNodo($1,$4);
+												gv_connect($$,$4);
+												sm_testa_qnt_args_excess_and_type(pt_tabela_fun_chamada,$1);
+											};
 
 /* regras para fluxos de controle */
 fluxo_controle: TK_PR_IF '(' expressao_logica ')' TK_PR_THEN then_else	{
@@ -725,8 +763,18 @@ int sm_infer_type_from_expr(int tau_one, int tau_two){
  */
 int sm_atr_verify_coercion_possible(int type_var,int type_value){
 	switch(type_var){
-		case IKS_STRING:{if(type_value == IKS_STRING) return IKS_STRING; else exit(IKS_ERROR_STRING_TO_X);}//TODO: ou seria IKS_ERROR_WRONG_TYPE??
-		case IKS_CHAR:  {if(type_value == IKS_CHAR)   return IKS_CHAR;   else exit(IKS_ERROR_CHAR_TO_X);  }
+		case IKS_STRING:{if(type_value == IKS_STRING) return IKS_STRING; else 
+											{
+												if(type_value != IKS_CHAR)
+													exit(IKS_ERROR_WRONG_TYPE);
+												exit(IKS_ERROR_CHAR_TO_X);
+											}}//TODO: ou seria IKS_ERROR_WRONG_TYPE??
+		case IKS_CHAR:  {if(type_value == IKS_CHAR)   return IKS_CHAR;   else
+											{
+												if(type_value != IKS_STRING)
+													exit(IKS_ERROR_WRONG_TYPE);  
+												exit(IKS_ERROR_STRING_TO_X);
+											}}
 		default:{
 			if(type_value == IKS_STRING)
 				exit(IKS_ERROR_STRING_TO_X);
@@ -738,6 +786,22 @@ int sm_atr_verify_coercion_possible(int type_var,int type_value){
 
 }
 
+/*
+ *	Verificacao do tipo do argumento de retorno de funcao.
+ */
+inline int sm_ret_verify_return_type(int fun_ret_type,int return_var_type){
+	switch(fun_ret_type){
+		case IKS_STRING:{if(return_var_type == IKS_STRING) return IKS_STRING; else exit(IKS_ERROR_WRONG_PAR_RETURN);}//TODO: ou seria IKS_ERROR_WRONG_TYPE??
+		case IKS_CHAR:  {if(return_var_type == IKS_CHAR)   return IKS_CHAR;   else exit(IKS_ERROR_WRONG_PAR_RETURN);  }
+		default:{
+			if(return_var_type == IKS_STRING)
+				exit(IKS_ERROR_WRONG_PAR_RETURN);
+			if(return_var_type == IKS_CHAR)
+				exit(IKS_ERROR_WRONG_PAR_RETURN);
+			return fun_ret_type; //Fazer a coercao para qualquer tipo que seja, ja que qualquer uma eh possivel.
+		}
+	};
+}
 
 inline void sm_verify_if_variable(comp_dict_item_t* item){
 	if(item->tipo_estrutura != IKS_TYPE_VARIABLE){
@@ -750,7 +814,7 @@ inline void sm_verify_if_variable(comp_dict_item_t* item){
 inline void sm_verify_if_vector(comp_dict_item_t* item){
 	if(item->tipo_estrutura != IKS_TYPE_VECTOR){
 		if(item->tipo_estrutura == IKS_TYPE_VARIABLE)
-			exit(IKS_ERROR_VECTOR);
+			exit(IKS_ERROR_VARIABLE);
 		exit(IKS_ERROR_FUNCTION);
 	}
 }
@@ -765,16 +829,60 @@ inline void sm_verify_if_function(comp_dict_item_t* item){
 
 inline void inicializa_dic_escopo_global(){
 	dicionario_atual = dicionario_escopo_global;
-	escopo_eh_local = 1;
+	escopo_eh_local = 0;
 	passou_declaracoes_funcao = 0;
 }
 
 inline void inicializa_dic_escopo_local(){
-	escopo_eh_local = 0;
+	escopo_eh_local = 1;
 	passou_declaracoes_funcao = 0;
 	dicionario_escopo_global = dicionario_atual;
-	dicionarioRemove(dicionario_escopo_local);
+	dicionarioRemove(&dicionario_escopo_local);
 	dicionario_atual = dicionario_escopo_local;
 }
 
+//Funcao que testa se o tipo do argumento utilizado num comando output eh correto.
+inline void sm_testa_tipos_output(comp_dict_item_t* item){
+	if(item->tipo_dado == IKS_CHAR)//Com os tipos atuais, unico caso onde a funcao nao esta definida
+		exit(IKS_ERROR_WRONG_PAR_OUTPUT);
+}
 
+inline comp_dict_item_t* sm_define_tipo_funcao(int tipo_funcao, comp_dict_item_t* pt_tabela){
+	pt_tabela_funcao = pt_tabela;
+	pt_tabela->tipo_dado = tipo_funcao;
+	pt_tabela->tipo_estrutura = IKS_TYPE_FUNCTION;
+	return pt_tabela;
+}
+
+inline void sm_insere_lista_args(int tipo,comp_dict_item_t* pt_id){
+	//printf("UNO... valor pteiro = %p\n", pt_tabela_funcao);
+	listaInsereNodo(&(pt_tabela_funcao->lista_args_funcao),listaCriaNodo(tipo));
+	//printf("DOS...\n");
+	pt_id->tipo_dado = tipo;
+	pt_id->tipo_estrutura = IKS_TYPE_VARIABLE;
+}
+
+inline void sm_testa_qnt_args_missing(comp_dict_item_t* fun){
+	if(contador_args_chamada_funcao < listaQtdeNodos(fun->lista_args_funcao))
+		exit(IKS_ERROR_MISSING_ARGS);
+}
+inline int sm_fun_call_type_verify_coercion(int fun_arg_type,int expr_type){
+	switch(fun_arg_type){
+		case IKS_STRING:{if(expr_type == IKS_STRING) return IKS_STRING; else exit(IKS_ERROR_WRONG_TYPE_ARGS);}//TODO: ou seria IKS_ERROR_WRONG_TYPE??
+		case IKS_CHAR:  {if(expr_type == IKS_CHAR)   return IKS_CHAR;   else exit(IKS_ERROR_WRONG_TYPE_ARGS);}
+		default:{
+			if(expr_type == IKS_STRING)
+				exit(IKS_ERROR_WRONG_TYPE_ARGS);
+			if(expr_type == IKS_CHAR)
+				exit(IKS_ERROR_WRONG_TYPE_ARGS);
+			return fun_arg_type; //Fazer a coercao para qualquer tipo que seja, ja que qualquer uma eh possivel.
+		}
+	};
+} 
+inline void sm_testa_qnt_args_excess_and_type(comp_dict_item_t* fun,comp_tree_t* expr){
+	if(contador_args_chamada_funcao > listaQtdeNodos(fun->lista_args_funcao))
+		exit(IKS_ERROR_EXCESS_ARGS);
+	contador_regressivo_args_chamada_funcao--;
+	sm_fun_call_type_verify_coercion((listaRetornaNodoIdx(fun->lista_args_funcao,contador_regressivo_args_chamada_funcao))->info,expr->tipo_dado);
+	
+}

@@ -13,6 +13,7 @@ typedef struct {
    int tipo_dado;	//Tipo do dado.
    int tipo_estrutura;	//Tipo de estrutura: vetor ou variavel
    int tamanho;		//Tamanho total do dado.
+   struct comp_list_t* lista_args_funcao;//Lista de argumentos e tipos deles para funcoes.
    struct comp_dict_item_t *prox;
 } comp_dict_item_t;
 
@@ -29,7 +30,7 @@ comp_dict_item_t* dicionarioCriaItem(char *chave,int numLinha,int intTipo,int in
 void dicionarioInsereItem(comp_dict_t *Dicionario, comp_dict_item_t *novoItem);
 int dicionarioProcuraChave(comp_dict_t *Dicionario, char *Chave);
 void dicionarioRemoveChave(comp_dict_t *Dicionario, char *Chave);
-void dicionarioRemove(comp_dict_t *Dicionario);
+void dicionarioRemove(comp_dict_t **Dicionario);
 void dicionarioImprime(comp_dict_t *Dicionario);
 int dicionarioQtdeItens(comp_dict_t *Dicionario);
 void dicionarioAtualizaLinha(comp_dict_t *Dicionario, char *chave, int novoValor);

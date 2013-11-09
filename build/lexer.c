@@ -551,19 +551,18 @@ char *yytext;
 #include "main.h"
 #include "parser.h"
 
-//comp_dict_t *dicionario;
-//comp_dict_t *dicionario_escopo_local;
-//comp_dict_t *dicionario_atual;
-
 comp_dict_item_t *itemDic;
 
 int getLineNumber(void);
 void initDicionario(void);
+inline int procura_dic(comp_dict_t* dic, char * chave);
+inline void add_item_dicionario(comp_dict_t* dic);
+inline void referenciar_dicionario(comp_dict_t* dic);
+inline void testa_erro_input();
 
 
 
-
-#line 567 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
+#line 566 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 #define INITIAL 0
 #define comentario 1
@@ -752,9 +751,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 35 "scanner.l"
+#line 34 "scanner.l"
 
-#line 758 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
+#line 757 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 	if ( !(yy_init) )
 		{
@@ -839,197 +838,198 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 36 "scanner.l"
+#line 35 "scanner.l"
 BEGIN(comentario);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 38 "scanner.l"
+#line 37 "scanner.l"
 /* consome qualquer coisa que não seja '*' */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 39 "scanner.l"
+#line 38 "scanner.l"
 /* consome todos os '*' que não são seguidos de '/' */
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 40 "scanner.l"
+#line 39 "scanner.l"
 ++yylineno;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 41 "scanner.l"
+#line 40 "scanner.l"
 BEGIN(INITIAL);
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 43 "scanner.l"
+#line 42 "scanner.l"
 BEGIN(comentario1);
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 45 "scanner.l"
+#line 44 "scanner.l"
 /* consome qualquer coisa que não seja '/' */
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 46 "scanner.l"
+#line 45 "scanner.l"
 ++yylineno;BEGIN(INITIAL);
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 48 "scanner.l"
+#line 47 "scanner.l"
 /* espaços */
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 50 "scanner.l"
+#line 49 "scanner.l"
 { return TK_PR_INT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 51 "scanner.l"
+#line 50 "scanner.l"
 { return TK_PR_FLOAT; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 52 "scanner.l"
+#line 51 "scanner.l"
 { return TK_PR_BOOL; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 53 "scanner.l"
+#line 52 "scanner.l"
 { return TK_PR_CHAR; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 54 "scanner.l"
+#line 53 "scanner.l"
 { return TK_PR_STRING; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 55 "scanner.l"
+#line 54 "scanner.l"
 { return TK_PR_IF; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 56 "scanner.l"
+#line 55 "scanner.l"
 { return TK_PR_THEN; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 57 "scanner.l"
+#line 56 "scanner.l"
 { return TK_PR_ELSE; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 58 "scanner.l"
+#line 57 "scanner.l"
 { return TK_PR_WHILE; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 59 "scanner.l"
+#line 58 "scanner.l"
 { return TK_PR_DO; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 60 "scanner.l"
+#line 59 "scanner.l"
 { return TK_PR_INPUT; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 61 "scanner.l"
+#line 60 "scanner.l"
 { return TK_PR_OUTPUT; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 62 "scanner.l"
+#line 61 "scanner.l"
 { return TK_PR_RETURN; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 64 "scanner.l"
+#line 63 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 65 "scanner.l"
+#line 64 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 66 "scanner.l"
+#line 65 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 67 "scanner.l"
+#line 66 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 68 "scanner.l"
+#line 67 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 69 "scanner.l"
+#line 68 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 70 "scanner.l"
+#line 69 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 71 "scanner.l"
+#line 70 "scanner.l"
 { return yytext[0]; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 73 "scanner.l"
+#line 72 "scanner.l"
 { return TK_OC_LE; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 74 "scanner.l"
+#line 73 "scanner.l"
 { return TK_OC_GE; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 75 "scanner.l"
+#line 74 "scanner.l"
 { return TK_OC_EQ; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 76 "scanner.l"
+#line 75 "scanner.l"
 { return TK_OC_NE; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 77 "scanner.l"
+#line 76 "scanner.l"
 { return TK_OC_AND; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 78 "scanner.l"
+#line 77 "scanner.l"
 { return TK_OC_OR; }
 	YY_BREAK
 case 37:
 /* rule 37 can match eol */
 YY_RULE_SETUP
-#line 79 "scanner.l"
+#line 78 "scanner.l"
 { ++yylineno; }
 	YY_BREAK
 case 38:
 /* rule 38 can match eol */
 YY_RULE_SETUP
-#line 81 "scanner.l"
-{					
+#line 80 "scanner.l"
+{	
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
                         if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -1037,6 +1037,7 @@ YY_RULE_SETUP
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_STRING,IKS_SIMBOLO_STRING);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_STRING;
 				return TK_LIT_STRING;
 			} else 
 			{
@@ -1048,8 +1049,9 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 99 "scanner.l"
+#line 100 "scanner.l"
 {
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -1057,6 +1059,7 @@ YY_RULE_SETUP
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_INT,IKS_SIMBOLO_INT);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_INT;
 				return TK_LIT_INT;
 			} else 
 			{
@@ -1068,8 +1071,9 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 116 "scanner.l"
+#line 119 "scanner.l"
 {
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -1077,6 +1081,7 @@ YY_RULE_SETUP
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_FLOAT,IKS_SIMBOLO_FLOAT);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_FLOAT;
 				return TK_LIT_FLOAT;
 			} else 
 			{
@@ -1088,8 +1093,9 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 133 "scanner.l"
+#line 138 "scanner.l"
 {
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -1097,6 +1103,7 @@ YY_RULE_SETUP
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_FALSE,IKS_SIMBOLO_BOOL);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_BOOL;
 				return TK_LIT_FALSE;
 			} else 
 			{
@@ -1108,8 +1115,9 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 150 "scanner.l"
+#line 157 "scanner.l"
 {
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -1117,6 +1125,7 @@ YY_RULE_SETUP
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_TRUE,IKS_SIMBOLO_BOOL);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_BOOL;
 				return TK_LIT_TRUE;
 			} else 
 			{
@@ -1129,8 +1138,9 @@ YY_RULE_SETUP
 case 43:
 /* rule 43 can match eol */
 YY_RULE_SETUP
-#line 167 "scanner.l"
+#line 176 "scanner.l"
 {
+			testa_erro_input();
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
@@ -1138,6 +1148,7 @@ YY_RULE_SETUP
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_LIT_CHAR,IKS_SIMBOLO_CHAR);
 				yylval.symbol = itemDic;
 				dicionarioInsereItem(dicionario_atual,itemDic);
+				itemDic->tipo_dado = IKS_CHAR;
 				return TK_LIT_CHAR;
 			} else 
 			{
@@ -1149,10 +1160,54 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 184 "scanner.l"
+#line 195 "scanner.l"
 {
+			//if(com_eh_input) //Nao precisaria desse 'if'
+				com_eh_input = 0;
 			if (!dicionarioExiste(dicionario_atual))
 				initDicionario();
+			switch(escopo_eh_local){
+				case 1:{
+					if(!passou_declaracoes_funcao){//Declaracao variavel local/parametro
+						if(procura_dic(dicionario_atual,yytext) == 0)//Procura item no dicionario local, nao deve achar...
+						{
+							add_item_dicionario(dicionario_atual);
+						} else {
+							exit(IKS_ERROR_DECLARED);//Encontrou algo, eh uma redeclaracao.
+						}
+					} else{//Esta no escopo da funcao, mas ja passou pelas declaracoes de parametros/variaveis locais
+						//TODO: procura no dicionario local. Se nao estiver la, procura no global. Se nao estiver la, ERRO!
+						if(procura_dic(dicionario_atual,yytext) != 0)//Esta no local
+						{
+							referenciar_dicionario(dicionario_atual);
+						} else {
+							if(procura_dic(dicionario_escopo_global,yytext) != 0)//Esta no global
+								referenciar_dicionario(dicionario_escopo_global);
+							else{
+								exit(IKS_ERROR_UNDECLARED);//Variavel referenciada nao foi declarada...
+                            }
+						}
+					}
+					break;
+				}
+				case 0:{//Referencia no escopo global -> dicionario_atual eh o global
+                    if(procura_dic(dicionario_atual,yytext) == 0){//Caso bom, nao eh uma redeclaracao...
+						add_item_dicionario(dicionario_atual);//dicionario_atual eh o global, gracas ao parser
+                        dicionario_escopo_global = dicionario_atual;
+                        //printf("Adicionou %s, %p.\n", yytext,dicionario_atual);
+                        //dicionarioImprime(dicionario_atual);
+                    }
+					else//Caso ruim, achou algo, redeclaracao.
+						exit(IKS_ERROR_DECLARED);//Esta havendo uma redeclaracao, eh um erro!					
+					break;
+				}
+				default:{//Caso inalcancavel...
+					fprintf(stderr,"Erro impossivel, como?\n");
+					exit(IKS_FATAL_ERROR);
+				}
+			};
+			return TK_IDENTIFICADOR;
+/*//Matido para lembrar como era...
 			if(dicionarioProcuraChave(dicionario_atual,yytext) == 0)
 			{
 				itemDic = dicionarioCriaItem(yytext,yylineno,TK_IDENTIFICADOR,IKS_SIMBOLO_IDENTIFICADOR);
@@ -1160,30 +1215,31 @@ YY_RULE_SETUP
 				dicionarioInsereItem(dicionario_atual,itemDic);	
 				return TK_IDENTIFICADOR;
 			} else 
-			{
+			{	
 				yylval.symbol = dicionarioRetornaChave(dicionario_atual,yytext);
 				dicionarioAtualizaLinha(dicionario_atual,yytext,yylineno);
                                 return TK_IDENTIFICADOR;
 			}
+*/
 		}
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(comentario):
 case YY_STATE_EOF(comentario1):
-#line 201 "scanner.l"
+#line 257 "scanner.l"
 {return TOKEN_EOF;}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 203 "scanner.l"
+#line 259 "scanner.l"
 { printf("Erro\n"); return TOKEN_ERRO; }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 204 "scanner.l"
+#line 260 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1187 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
+#line 1243 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/lexer.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2179,7 +2235,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 204 "scanner.l"
+#line 260 "scanner.l"
 
 
 
@@ -2188,10 +2244,29 @@ int getLineNumber(void)
 	return yylineno;
 }
 
-//void initDicionario(void);
 void initDicionario(void)
 {
    int token = 0;
    dicionario_atual = dicionarioCria(token);
+}
+
+inline int procura_dic(comp_dict_t* dic, char * chave){
+	return 	dicionarioProcuraChave(dic,chave);
+}
+
+inline void add_item_dicionario(comp_dict_t* dic){
+	itemDic = dicionarioCriaItem(yytext,yylineno,TK_IDENTIFICADOR,IKS_SIMBOLO_IDENTIFICADOR);
+	yylval.symbol = itemDic;
+	dicionarioInsereItem(dic,itemDic);
+}
+
+inline void referenciar_dicionario(comp_dict_t* dic){
+	yylval.symbol = dicionarioRetornaChave(dic,yytext);
+	dicionarioAtualizaLinha(dic,yytext,yylineno);
+}
+
+inline void testa_erro_input(){
+	if(com_eh_input == 1)
+		exit(IKS_ERROR_WRONG_PAR_INPUT);
 }
 
