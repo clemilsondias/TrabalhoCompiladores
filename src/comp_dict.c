@@ -59,6 +59,7 @@ comp_dict_item_t* dicionarioCriaItem(char *chave,int numLinha,int intTipo,int in
    novoItem->simbolo = intSimbolo;
    novoItem->prox = NULL;
    novoItem->lista_args_funcao = NULL;
+   novoItem->lista_tamanhos_dimensao = NULL;
    novoItem->tamanho = 0;
 
    return novoItem;

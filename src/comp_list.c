@@ -179,3 +179,36 @@ comp_list_t* listaConcatena(comp_list_t *Lista1, comp_list_t *Lista2) {
    Lista2->prev = aux;
    return Lista1;
 }
+
+
+
+
+
+
+
+//função que insere um nodo no inicio da lista.
+comp_list_t* listaAdicionaNodo_Inicio(comp_list_t *Lista, comp_list_t* novoNodo) {
+   comp_list_t *aux = Lista;
+
+   //verifico se a lista está vazia
+   if (listaVazia(aux) == 1)
+   {
+      return novoNodo;
+   } 
+ 
+   //adiciono o novo nodo no inicio da lista
+   aux->prev = novoNodo;
+   novoNodo->prox = aux;
+   return novoNodo;
+}
+
+
+//funcao que calcula o produto dos elementos da lista.
+int listaCalculaProduto(comp_list_t* Lista){
+	int resultado = 1;
+	while(Lista != NULL){
+		resultado = resultado * (Lista->info);
+		Lista = Lista->prox;
+	}
+	return resultado;
+}

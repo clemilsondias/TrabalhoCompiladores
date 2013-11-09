@@ -1,4 +1,2 @@
 digraph G {
-node_0x137c3d0 [label="block"]
-node_0x137c400 [label="f"]
-node_0x137c400 -> node_0x137c3d0
+}

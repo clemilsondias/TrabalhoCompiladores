@@ -13,6 +13,7 @@ typedef struct {
    int tipo_dado;	//Tipo do dado.
    int tipo_estrutura;	//Tipo de estrutura: vetor ou variavel
    int tamanho;		//Tamanho total do dado.
+   struct comp_list_t* lista_tamanhos_dimensao;//Lista com tamanhos das dimensoes de arranjos.
    struct comp_list_t* lista_args_funcao;//Lista de argumentos e tipos deles para funcoes.
    struct comp_dict_item_t *prox;
 } comp_dict_item_t;

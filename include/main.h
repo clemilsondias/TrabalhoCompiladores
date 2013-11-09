@@ -114,6 +114,9 @@
 #define IKS_ERROR_WRONG_PAR_OUTPUT	13	//parâmetro não é literal string ou expressão
 #define IKS_ERROR_WRONG_PAR_RETURN	14	//parâmetro não é expressão compatível com tipo do retorno
 
+
+#define IKS_ERROR_DIM_NOT_POSITIVE	15	//Dimensao informada nao eh positiva
+
 #define IKS_FATAL_ERROR			666	//154, ja que a saida eh um inteiro de 1 byte.
 
 extern int yylileno;

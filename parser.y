@@ -20,6 +20,12 @@ comp_dict_t *dicionario_escopo_local;
 comp_dict_t *dicionario_atual;
 comp_dict_item_t * pt_tabela_funcao;//Guarda um ponteiro para a entrada na tabela de simbolos da funcao que esta sendo reconhecida
 comp_dict_item_t * pt_tabela_fun_chamada;
+
+//Definicao de tamanhos de variaveis e vetores.
+inline int sm_size_from_type_var(int type);
+inline int sm_size_from_type_vec(int type,comp_list_t* dim_lst);
+
+
 inline void sm_verify_if_variable(comp_dict_item_t* variable);
 inline void sm_verify_if_vector(comp_dict_item_t* vector);
 inline void sm_verify_if_function(comp_dict_item_t* item);
@@ -32,6 +38,10 @@ inline void sm_insere_lista_args(int tipo,comp_dict_item_t* pt_id);
 inline void sm_testa_qnt_args_missing(comp_dict_item_t* fun);
 inline void sm_testa_qnt_args_excess_and_type(comp_dict_item_t* fun,comp_tree_t* expr);
 inline int sm_fun_call_type_verify_coercion(int fun_arg_type,int expr_type);
+
+//ETAPA 5
+inline comp_list_t* sm_init_lista_dimensoes();
+inline comp_list_t* sm_adiciona_dimensao(comp_list_t* lst,int t_dim);
 
 %}
 
@@ -50,6 +60,10 @@ inline int sm_fun_call_type_verify_coercion(int fun_arg_type,int expr_type);
  int type_data;
 };
 
+%union
+{
+ comp_list_t* dim_lst;
+};
  
 /* Declaração dos tokens da gramática da Linguagem IKS */
 %token TK_PR_INT
@@ -89,6 +103,7 @@ inline int sm_fun_call_type_verify_coercion(int fun_arg_type,int expr_type);
 		  expressao_indexada_id chamada_funcao_id
 %type <symbol> cabecalho id_funcao
 %type <type_data> tipo decl_parametro
+%type <dim_lst> dimensoes
 %right '='
 %nonassoc TK_OC_LE TK_OC_GE TK_OC_EQ TK_OC_NE '<' '>'
 %left TK_OC_AND TK_OC_OR
@@ -140,11 +155,20 @@ decl_variavel: tipo ':' TK_IDENTIFICADOR ';'			{
 									$3->tipo_estrutura = IKS_TYPE_VARIABLE; //É uma variável simples...
 									$3->tamanho = sm_size_from_type_var($1);
 								};
-decl_vetor: tipo ':' TK_IDENTIFICADOR '[' TK_LIT_INT ']' ';'	{
-									$3->tipo_dado = $1;
-									$3->tipo_estrutura = IKS_TYPE_VECTOR;//É um vetor...
-									$3->tamanho = sm_size_from_type_vec($1,atoi($5->chave)); 
-								};
+decl_vetor: tipo ':' TK_IDENTIFICADOR dimensoes ';'	{
+								$3->tipo_dado = $1;
+								$3->tipo_estrutura = IKS_TYPE_VECTOR;//É um vetor...
+								$3->lista_tamanhos_dimensao = $4;
+								$3->tamanho = sm_size_from_type_vec($1,$4); 
+							};
+
+dimensoes:  '[' TK_LIT_INT ']'	{
+					$$ = sm_init_lista_dimensoes();
+					$$ = sm_adiciona_dimensao($$,atoi($2->chave));
+				}
+	  | '[' TK_LIT_INT ']' dimensoes	{
+							$$ = sm_adiciona_dimensao($4,atoi($2->chave));
+						};
 
 /* declaracao de parametro de função */
 decl_parametro: tipo ':' TK_IDENTIFICADOR {sm_insere_lista_args($1,$3);$3->tamanho = sm_size_from_type_var($1);}
@@ -725,7 +749,9 @@ int sm_size_from_type_var(int type){
 		} 
 	};
 }
-int sm_size_from_type_vec(int type,int length){
+
+inline int sm_size_from_type_vec(int type,comp_list_t* dim_lst){
+	int length = listaCalculaProduto(dim_lst);
 	switch(type){
 		case IKS_INT:		{return IKS_SIZE_VECTOR_INT(length);}
 		case IKS_FLOAT:		{return	IKS_SIZE_VECTOR_FLOAT(length);}
@@ -739,7 +765,7 @@ int sm_size_from_type_vec(int type,int length){
 	};
 }
 
-int sm_infer_type_from_expr(int tau_one, int tau_two){
+inline int sm_infer_type_from_expr(int tau_one, int tau_two){
 
 	switch(tau_one){
 		case IKS_STRING:{if(tau_two == IKS_STRING) return IKS_STRING; else exit(IKS_ERROR_STRING_TO_X);}
@@ -855,9 +881,7 @@ inline comp_dict_item_t* sm_define_tipo_funcao(int tipo_funcao, comp_dict_item_t
 }
 
 inline void sm_insere_lista_args(int tipo,comp_dict_item_t* pt_id){
-	//printf("UNO... valor pteiro = %p\n", pt_tabela_funcao);
 	listaInsereNodo(&(pt_tabela_funcao->lista_args_funcao),listaCriaNodo(tipo));
-	//printf("DOS...\n");
 	pt_id->tipo_dado = tipo;
 	pt_id->tipo_estrutura = IKS_TYPE_VARIABLE;
 }
@@ -886,3 +910,16 @@ inline void sm_testa_qnt_args_excess_and_type(comp_dict_item_t* fun,comp_tree_t*
 	sm_fun_call_type_verify_coercion((listaRetornaNodoIdx(fun->lista_args_funcao,contador_regressivo_args_chamada_funcao))->info,expr->tipo_dado);
 	
 }
+
+//ETAPA 5
+
+inline comp_list_t* sm_init_lista_dimensoes(){
+	return listaCria();
+}
+
+inline comp_list_t* sm_adiciona_dimensao(comp_list_t* lst,int t_dim){
+	if(t_dim < 1)
+		exit(IKS_ERROR_DIM_NOT_POSITIVE);
+	return listaAdicionaNodo_Inicio(lst,listaCriaNodo(t_dim));//Adiciona novo elemento ao inicio da lista.
+}
+

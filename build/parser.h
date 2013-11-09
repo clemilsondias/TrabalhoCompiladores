@@ -75,26 +75,32 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 39 "parser.y"
+#line 49 "parser.y"
  
   comp_dict_item_t* symbol; 
 
 
 /* Line 2068 of yacc.c  */
-#line 44 "parser.y"
+#line 54 "parser.y"
 
  comp_tree_t * tree_node;
 
 
 /* Line 2068 of yacc.c  */
-#line 49 "parser.y"
+#line 59 "parser.y"
 
  int type_data;
 
 
+/* Line 2068 of yacc.c  */
+#line 64 "parser.y"
+
+ comp_list_t* dim_lst;
+
+
 
 /* Line 2068 of yacc.c  */
-#line 98 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h"
+#line 104 "/home/rafael/UFRGS - ENGENHARIA DE COMPUTACAO/ETAPA 07/INF01147 - Compiladores/Final/TrabalhoCompiladores/build/parser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
