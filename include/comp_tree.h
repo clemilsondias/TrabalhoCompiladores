@@ -8,6 +8,8 @@ typedef struct comp_tree_t {
    int qtdeFilhos;
    int tipo;		//Tipo de nodo.
    int tipo_dado;	//Tipo de dado associado ao nodo.
+   int result_reg;
+   struct ILOC_OP_LIST * code;
    struct comp_dict_t * pt_tabela;
    struct comp_tree_t *filhos[];
 } comp_tree_t;

@@ -11,6 +11,7 @@
 #include "comp_tree.h"
 #include "comp_graph.h"
 #include "iks_ast.h"
+#include "Programa_ILOC.h"
 #include "gv.h"
 
 /*

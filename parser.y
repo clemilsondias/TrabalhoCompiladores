@@ -43,6 +43,7 @@ inline int sm_fun_call_type_verify_coercion(int fun_arg_type,int expr_type);
 inline comp_list_t* sm_init_lista_dimensoes();
 inline comp_list_t* sm_adiciona_dimensao(comp_list_t* lst,int t_dim);
 
+
 %}
 
 %union 
@@ -439,6 +440,9 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_connect($$,$3);
 							
 							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+							$$->code = ILOC_concat_lists($$->code,$3->code);
+							$$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_ADD),$1->result_reg,$2->result_reg,$2->result_reg);
 						}
                     | expressao '-' expressao	{ 
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_SUBTRACAO);
@@ -449,7 +453,9 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_connect($$,$3);
 
 							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
-
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_SUB),$1->result_reg,$2->result_reg,$2->result_reg);
 						}
                     | expressao '*' expressao	{ 
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_MULTIPLICACAO);
@@ -459,7 +465,10 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado); 
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_MULT),$1->result_reg,$2->result_reg,$2->result_reg);
 						}
                     | expressao '/' expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_ARIM_DIVISAO);
@@ -469,7 +478,10 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);	
 
 						}
 		    | '-' expressao 		{
@@ -479,6 +491,9 @@ expressao_aritmetica: expressao '+' expressao	{
 							gv_connect($$,$2);
 
 							$$->tipo_dado = $2->tipo_dado;
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_ADD/*??*/),,);
 						};
 
 /* regra para expressão lógica */
@@ -490,7 +505,10 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 				
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);
 						}
                 | expressao TK_OC_GE expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_GE);
@@ -500,7 +518,10 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);	
 						}
                 | expressao '<' expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_L);
@@ -510,7 +531,10 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);
 						}
 		| expressao '>' expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_G);
@@ -520,7 +544,10 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);
 						}
                 | expressao TK_OC_EQ expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_IGUAL);
@@ -531,6 +558,9 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$3);
 
 							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);
 						} 
                 | expressao TK_OC_NE expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_COMP_DIF);
@@ -540,7 +570,10 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);
 						}
                 | expressao TK_OC_AND expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_E);
@@ -550,7 +583,10 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);	
 						}
                 | expressao TK_OC_OR expressao	{
 							$$ = arvoreCriaNodo(3,IKS_AST_LOGICO_OU);
@@ -560,7 +596,10 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$1);
 							gv_connect($$,$3);
 
-							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);							
+							$$->tipo_dado = sm_infer_type_from_expr($1->tipo_dado,$3->tipo_dado);
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);
 						}
 		| '!' expressao 		{
 							$$ = arvoreCriaNodo(2,IKS_AST_LOGICO_COMP_NEGACAO);
@@ -569,18 +608,24 @@ expressao_logica: expressao TK_OC_LE expressao	{
 							gv_connect($$,$2);
 
 							$$->tipo_dado = $2->tipo_dado;
+							$$->code = ILOC_concat_lists($$->code,$1->code);
+                                                        $$->code = ILOC_concat_lists($$->code,$3->code);
+                                                        $$->code = ILOC_add_to_list($$->code,ILOC_create_operation(ILOC_DIV),$1->result_reg,$2->result_reg,$2->result_reg);
 						};
 
 /* regra para expressões em geral */
 expressao: expressao_aritmetica	{	$$ = $1;
 					$$->tipo_dado = $1->tipo_dado;
+					$$->code = $1->code;//Pode dar problema caso se queira "passar" pelo codigo do nodo $1.
 				}
          | expressao_logica	{	$$ = $1;
 					$$->tipo_dado = $1->tipo_dado;
+					$$->code = $1->code;
 				}
          | '(' expressao ')'	{
 					$$ = $2;
 					$$->tipo_dado = $2->tipo_dado;
+					$$->code = $2->code;
 				}
          | expressao_indexada_id '[' expressao ']'	{
 								$$ = arvoreCriaNodo(3,IKS_AST_VETOR_INDEXADO);

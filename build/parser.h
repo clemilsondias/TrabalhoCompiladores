@@ -75,25 +75,25 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 49 "parser.y"
+#line 51 "parser.y"
  
   comp_dict_item_t* symbol; 
 
 
 /* Line 2068 of yacc.c  */
-#line 54 "parser.y"
+#line 56 "parser.y"
 
  comp_tree_t * tree_node;
 
 
 /* Line 2068 of yacc.c  */
-#line 59 "parser.y"
+#line 61 "parser.y"
 
  int type_data;
 
 
 /* Line 2068 of yacc.c  */
-#line 64 "parser.y"
+#line 66 "parser.y"
 
  comp_list_t* dim_lst;
 

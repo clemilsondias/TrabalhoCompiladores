@@ -32,7 +32,7 @@ comp_tree_t* arvoreCriaNodo(int qtdeFilhos,int tipo) {
    for (i = 0; i < qtdeFilhos; i++)
       novoNodo->filhos[i] = NULL;
    novoNodo->pt_tabela = NULL;
-
+   novoNodo->code = ILOC_create_operation_list();
    return novoNodo;
 }
 
